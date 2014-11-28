@@ -4,6 +4,7 @@
 #include <QDir>
 #include <QVideoWidget>
 #include <QMediaPlayer>
+#include <QFileDialog>
 
 #include <iostream>
 
@@ -14,14 +15,14 @@
 
 int main(int argc, char *argv[])
 {
-    if(argc<2)
-    {
-        std::cout << "Usage: " << argv[0] << " (directory or file path)" << std::endl;
-        return 0;
-    }
-
+    QApplication a(argc, argv);
     QString path;
-    path = QString(argv[1]);
+    if(argc<2) {
+        std::cout << "Usage: " << argv[0] << " (directory or file path)" << std::endl;
+        path = QFileDialog::getExistingDirectory();
+    }
+    else
+        path = QString(argv[1]);
 
     QFileInfo fileinfo(path);
     if(!fileinfo.exists())
@@ -30,7 +31,6 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    QApplication a(argc, argv);
     MainWindow w;
     if(fileinfo.isDir())
         w.loadFolder(fileinfo.filePath());
