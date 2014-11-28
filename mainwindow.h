@@ -70,6 +70,7 @@ private:
     int list_index;
     QString folder;
     QSize img_size;
+    bool movie_finished, next_slide;
 
     QStringList FILETYPES;
     QStatusBar* status_bar;
@@ -95,7 +96,9 @@ public slots:
     void reloadFolder();
     void prevImage();
     void nextImage();
+    void nextSlide();
     void restartSlideshow(int na=0);
+    void movieFinished(int);
 };
 
 #endif // MAINWINDOW_H

@@ -47,8 +47,31 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(random_order, SIGNAL(clicked()), this, SLOT(reloadFolder()));
     connect(start_slideshow, SIGNAL(clicked()), this, SLOT(slideshowButton()));
-    connect(&slideshowTimer,SIGNAL(timeout()), this, SLOT(nextImage()));
+    connect(&slideshowTimer, SIGNAL(timeout()), this, SLOT(nextSlide()));
     connect(slideshow_time, SIGNAL(valueChanged(int)), this, SLOT(restartSlideshow(int)));
+    connect(img_durr->movie(), SIGNAL(frameChanged(int)), this, SLOT(movieFinished(int)));
+}
+
+void MainWindow::nextSlide()
+{
+    if(movie_finished)
+        nextImage();
+    else
+        next_slide = true;
+    std::cout << "nextSlide" << std::endl;
+}
+
+void MainWindow::movieFinished(int frame)
+{
+    if(frame == img_durr->movie()->frameCount()-1) {
+        std::cout << frame << std::endl;
+        if(slideshowTimer.isActive() && next_slide)
+            nextImage();
+        else {
+            movie_finished = true;
+            std::cout << "movie_finished" << std::endl;
+        }
+    }
 }
 
 void MainWindow::slideshowButton()
@@ -295,6 +318,9 @@ void MainWindow::setImage()
     QSize newsize = img_size;
     newsize.scale(size().width()-100, size().height()-100, Qt::KeepAspectRatio);
     img_durr->movie()->setScaledSize(newsize);
+
+    movie_finished = img_durr->movie()->frameCount()==1;
+    next_slide = false;
 
     resetSpeed();
     img_durr->movie()->start();
