@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "quca.hpp"
 
 #include <iostream>
 #include <QFile>
@@ -118,6 +119,9 @@ void MainWindow::loadFolder(QString folder, QString file)
 
     if(random_order->isChecked())
         std::random_shuffle(list.begin(), list.end());
+    else
+        QUnicodeCollationAlgorithm::collatorKeySort(list);
+
     if(file=="" || list.indexOf(file,0)<0)
         list_index = 0;
     else
