@@ -40,10 +40,12 @@ MainWindow::MainWindow(QWidget *parent) :
     slideshow_time->setRange(1, 60);
     slideshow_time->setFocusPolicy(Qt::NoFocus);
     start_slideshow->setFocusPolicy(Qt::NoFocus);
+    status_bar->addWidget(random_order = new QCheckBox("Random"));
     status_bar->addWidget(status_bar_text = new QLabel(),1);
     status_bar_text->setAlignment(Qt::AlignRight);
 
 
+    connect(random_order, SIGNAL(clicked()), this, SLOT(reloadFolder()));
     connect(start_slideshow, SIGNAL(clicked()), this, SLOT(slideshowButton()));
     connect(&slideshowTimer,SIGNAL(timeout()), this, SLOT(nextImage()));
     connect(slideshow_time, SIGNAL(valueChanged(int)), this, SLOT(restartSlideshow(int)));
@@ -94,6 +96,9 @@ void MainWindow::loadFolder(QString folder, QString file)
         clearImage();
         return;
     }
+
+    if(random_order->isChecked())
+        std::random_shuffle(list.begin(), list.end());
     if(file=="" || list.indexOf(file,0)<0)
         list_index = 0;
     else
@@ -232,7 +237,7 @@ void MainWindow::resetSpeed()
 
 void MainWindow::startSlideshow()
 {
-    slideshowTimer.start(slideshowTime);
+    slideshowTimer.start(slideshow_time->value() * 1000);
     std::cout << "starting slideshow" << std::endl;
     //this->showFullScreen();
 }

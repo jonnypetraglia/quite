@@ -77,6 +77,7 @@ private:
     QLabel* status_bar_speed;
     QCheckBox** filetype_checks;
     QPushButton* start_slideshow;
+    QCheckBox* random_order;
     QSpinBox* slideshow_time;
 
     QTimer slideshowTimer;
