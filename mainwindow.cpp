@@ -108,11 +108,7 @@ void MainWindow::loadFolder(QString folder, QString file)
 
     this->folder = folder;
     QDir _folder(folder);
-    std::cerr << filetypes_want.join(QChar(' ')).toStdString() << std::endl;
     list = _folder.entryList(filetypes_want);
-    std::cout << "loadFolder " << folder.toStdString() << " " << file.toStdString() << std::endl;
-    for(int i=0; i<list.size(); i++)
-        std::cout << "  loadFolder " << list.at(i).toStdString() << std::endl;
 
     if(list.size()==0)
     {
@@ -126,7 +122,6 @@ void MainWindow::loadFolder(QString folder, QString file)
         list_index = 0;
     else
         list_index = list.indexOf(file,0);
-    std::cout << "loadFolder " << list_index << " of " << list.size() << std::endl;
     setImage();
 }
 
