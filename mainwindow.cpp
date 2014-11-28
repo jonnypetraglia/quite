@@ -51,10 +51,13 @@ MainWindow::MainWindow(QWidget *parent) :
 
 void MainWindow::slideshowButton()
 {
-    if(slideshowTimer.isActive())
+    if(slideshowTimer.isActive()) {
         stopSlideshow();
-    else
+        start_slideshow->setText("Slide");
+    } else {
         startSlideshow();
+        start_slideshow->setText("Stop");
+    }
 }
 
 void MainWindow::reloadFolder()
@@ -133,28 +136,33 @@ void MainWindow::keyPressEvent(QKeyEvent * e)
     switch (e->key()) {
         case Qt::Key_Right:
             nextImage();
-            return;
+            break;
         case Qt::Key_Left:
             prevImage();
-            return;
+            break;
         case Qt::Key_Plus:
             faster();
-            return;
+            break;
         case Qt::Key_Minus:
             slower();
-            return;
+            break;
         case Qt::Key_0:
             resetSpeed();
-            return;
+            break;
         case Qt::Key_AsciiTilde:
             startSlideshow();
             return;
         case Qt::Key_Escape:
             stopSlideshow();
             return;
+        case Qt::Key_Space:
+            slideshowButton();
+            return;
         default:
             return;
     }
+    if(slideshowTimer.isActive())
+        restartSlideshow();
 }
 
 
@@ -235,6 +243,14 @@ void MainWindow::stopSlideshow()
     std::cout << "stahping slideshow" << std::endl;
     //this->showNormal();
 }
+
+void MainWindow::restartSlideshow(int na)
+{
+    na = 0; //-Wunused-parameter
+    stopSlideshow();
+    startSlideshow();
+}
+
 
 void MainWindow::clearImage()
 {

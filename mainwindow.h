@@ -94,6 +94,7 @@ public slots:
     void reloadFolder();
     void prevImage();
     void nextImage();
+    void restartSlideshow(int na=0);
 };
 
 #endif // MAINWINDOW_H
