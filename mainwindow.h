@@ -13,6 +13,7 @@
 #include <QLabel>
 #include <QMimeData>
 #include <QPushButton>
+#include <QSpinbox>
 
 #include <QMediaPlayer>
 #include <QVideoWidget>
@@ -76,8 +77,8 @@ private:
     QLabel* status_bar_speed;
     QCheckBox** filetype_checks;
     QPushButton* start_slideshow;
+    QSpinBox* slideshow_time;
 
-    int slideshowTime;
     QTimer slideshowTimer;
 
     void setImage();

@@ -34,6 +34,11 @@ MainWindow::MainWindow(QWidget *parent) :
     }
     status_bar->addWidget(status_bar_speed = new QLabel());
     status_bar->addWidget(start_slideshow = new QPushButton("Slide"));
+    status_bar->addWidget(slideshow_time = new QSpinBox());
+    slideshow_time->setValue(3);
+    slideshow_time->setSuffix("s");
+    slideshow_time->setRange(1, 60);
+    slideshow_time->setFocusPolicy(Qt::NoFocus);
     start_slideshow->setFocusPolicy(Qt::NoFocus);
     status_bar->addWidget(status_bar_text = new QLabel(),1);
     status_bar_text->setAlignment(Qt::AlignRight);
@@ -41,6 +46,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(start_slideshow, SIGNAL(clicked()), this, SLOT(slideshowButton()));
     connect(&slideshowTimer,SIGNAL(timeout()), this, SLOT(nextImage()));
+    connect(slideshow_time, SIGNAL(valueChanged(int)), this, SLOT(restartSlideshow(int)));
 }
 
 void MainWindow::slideshowButton()
