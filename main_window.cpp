@@ -270,6 +270,12 @@ void MainWindow::keyPressEvent(QKeyEvent * e)
             else if(slide_timer->isActive())
                 restartSlideshow();
             return;
+        case Qt::Key_F:
+            if(isFullScreen())
+                showNormal();
+            else
+                showFullScreen();
+            return;
         default:
             return;
     }
