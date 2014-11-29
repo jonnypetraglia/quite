@@ -1,25 +1,29 @@
+#include <QDebug>
+
 #include "mainwindow.h"
 #include <QApplication>
 #include <QFileInfo>
 #include <QDir>
 #include <QVideoWidget>
 #include <QMediaPlayer>
-#include <QFileDialog>
-
-#include <iostream>
-
-/*TODO:
- * -empty folder crashes
- * -order by: name, type, shuffle
- */
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+
+    MainWindow w;
+    qDebug() << "in Main";
+    w.show();
+    qDebug() << "window shown";
+    return a.exec();
+
     QString path;
     if(argc<2) {
-        std::cout << "Usage: " << argv[0] << " (directory or file path)" << std::endl;
-        path = QFileDialog::getExistingDirectory();
+        QTextStream(stdout) << "Usage: "
+                  << QFileInfo( QCoreApplication::applicationFilePath() ).fileName()
+                  << " path_to_dir_or_file"
+                  ; //<< endl;
+        w.browseForFolder(NULL);
     }
     else
         path = QString(argv[1]);
@@ -27,15 +31,14 @@ int main(int argc, char *argv[])
     QFileInfo fileinfo(path);
     if(!fileinfo.exists())
     {
-        std::cerr << "File does not exist: " << path.toStdString() << std::endl;
+        qDebug() << "File does not exist: " << path;
         return 1;
     }
 
-    MainWindow w;
+    qDebug() << path;
     if(fileinfo.isDir())
         w.loadFolder(fileinfo.filePath());
     else
         w.loadFolder(fileinfo.absoluteDir().absolutePath(), fileinfo.fileName());
-    w.show();
     return a.exec();
 }

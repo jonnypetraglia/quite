@@ -1,25 +1,21 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <QDebug>
+
 #include <QMainWindow>
-#include <QLabel>
-#include <QPixmap>
-#include <QStringList>
-#include <QResizeEvent>
-#include <QSize>
-#include <QTimer>
-#include <QStatusBar>
-#include <QCheckBox>
-#include <QLabel>
-#include <QMimeData>
 #include <QPushButton>
 #include <QSpinbox>
+#include <QDial>
+#include <QTimer>
+#include <QMenuBar>
 
-#include <QMediaPlayer>
-#include <QVideoWidget>
-#include <iostream>
-#include <QFileInfo>
 #include <QDir>
+#include <QMimeData>
+#include <QFileDialog>
+
+#include "image_manager.h"
+#include "video_manager.h"
 
 namespace Ui {
 class MainWindow;
@@ -36,69 +32,63 @@ public:
     void wheelEvent(QWheelEvent *);
     void resizeEvent(QResizeEvent * qre);
     ~MainWindow();
-    void loadFolder(QString folder, QString file = "");
 
     void dragMoveEvent(QDragMoveEvent *de) { de->accept(); }
     void dragEnterEvent(QDragEnterEvent *event) { event->acceptProposedAction();}
+    void dropEvent(QDropEvent*);
 
-    void dropEvent(QDropEvent *de)
-    {
-        if(de->mimeData()->hasUrls())
-        {
-            QString path = de->mimeData()->urls().first().toString().remove(0, QString("file:///").length());
-            QFileInfo pathInfo = QFileInfo(path);
-            std::cout << "dropped: " << path.toStdString() << std::endl;
-            int ind = FILETYPES.indexOf(QString("*.").append(pathInfo.suffix()));
-            if(pathInfo.isDir() || ind>=0)
-            {
-                if(ind>=0)
-                    filetype_checks[ind]->setChecked(true);
-                if(pathInfo.isDir())
-                    loadFolder(path);
-                else
-                    loadFolder(pathInfo.dir().absolutePath(), pathInfo.fileName());
-            } else {
-                std::cerr << "ERROR Invalid filetype: " << pathInfo.suffix().toStdString() << std::endl;
-            }
-        }
-    }
+
+    void loadFolder(QString folder, QString file = "");
     
 private:
-    Ui::MainWindow *ui;
-    QLabel* img_durr;
+    //Ui::MainWindow *ui;
+    const int WIDTH = 731, HEIGHT = 518;
+    QMenuBar* menu_bar;
+
     QStringList list;
     int list_index;
     QString folder;
-    QSize img_size;
-    bool movie_finished, next_slide;
 
-    QStringList FILETYPES;
+    ImageManager* image_manager;
+    VideoManager* video_manager;
+    MediaManager* current_manager = NULL;
+
     QStatusBar* status_bar;
     QLabel* status_bar_text;
     QLabel* status_bar_speed;
-    QCheckBox** filetype_checks;
     QPushButton* start_slideshow;
     QCheckBox* random_order;
     QSpinBox* slideshow_time;
+    QDial* volume_dial;
 
-    QTimer slideshowTimer;
+    QTimer* slide_timer;
+    bool goto_next_slide;
 
-    void setImage();
-    void clearImage();
+    // Item Related
+    void loadItem();
+    void clearItem();
+    // Speed related
     void faster();
     void slower();
-    void resetSpeed();
+    void setSpeed(double d=100);
+    // SlideshowRelated
     void startSlideshow();
     void stopSlideshow();
 
 public slots:
+    void browseForFolder(QAction*);
     void slideshowButton();
     void reloadFolder();
-    void prevImage();
-    void nextImage();
-    void nextSlide();
+    void prevItem();
+    void nextItem();
     void restartSlideshow(int na=0);
-    void movieFinished(int);
+    void volumeChange(int);
+    void nextItemWhenConvenient() {
+        if(slide_timer->isActive() && goto_next_slide)
+            nextItem();
+        else
+            goto_next_slide = true;
+    }
 };
 
 #endif // MAINWINDOW_H

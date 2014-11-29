@@ -16,9 +16,14 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp\
-        quca.hpp
+        quca.hpp\
+        image_manager.cpp\
+        video_manager.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += mainwindow.h\
+            media_manager.h\
+            image_manager.h\
+            video_manager.h
 
 FORMS    += mainwindow.ui
 
