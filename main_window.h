@@ -42,6 +42,22 @@ public:
     void loadFolder(QString folder, QString file = "");
     void setSpeed(double d=100);
     
+public slots:
+    void browseForFile();
+    void browseForFolder();
+    void slideshowButton();
+    void reloadFolder();
+    void prevItem();
+    void nextItem();
+    void restartSlideshow(int na=0);
+    void volumeChange(int);
+    void nextItemWhenConvenient() {
+        if(slide_timer->isActive() && goto_next_slide)
+            nextItem();
+        else
+            goto_next_slide = true;
+    }
+
 private:
     //Ui::MainWindow *ui;
     const int WIDTH = 731, HEIGHT = 518;
@@ -70,22 +86,6 @@ private:
     // SlideshowRelated
     void startSlideshow();
     void stopSlideshow();
-
-public slots:
-    void browseForFile();
-    void browseForFolder();
-    void slideshowButton();
-    void reloadFolder();
-    void prevItem();
-    void nextItem();
-    void restartSlideshow(int na=0);
-    void volumeChange(int);
-    void nextItemWhenConvenient() {
-        if(slide_timer->isActive() && goto_next_slide)
-            nextItem();
-        else
-            goto_next_slide = true;
-    }
 };
 
 #endif // MAINWINDOW_H
