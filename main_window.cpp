@@ -191,6 +191,8 @@ void MainWindow::loadFolder(QString folder, QString file)
 void MainWindow::browseForFile()
 {
     QString file = QFileDialog::getOpenFileName(this); //TODO filetype filtering
+    if(file.length()==0)
+        return;
     QFileInfo fileinfo(file);
     if(fileinfo.isDir())
         loadFolder(fileinfo.filePath());
@@ -200,7 +202,9 @@ void MainWindow::browseForFile()
 
 void MainWindow::browseForFolder()
 {
-    loadFolder(QFileDialog::getExistingDirectory(this));
+    QString newFolder = QFileDialog::getExistingDirectory(this);
+    if(newFolder.length()>0)
+        loadFolder(newFolder);
 }
 
 
