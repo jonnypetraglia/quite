@@ -17,6 +17,8 @@ public:
     void setSpeed(double);
     void resize(QResizeEvent*);
     bool togglePause();
+    void faster();
+    void slower();
 
     double getSpeed() {
         return image_widget->movie()->speed();

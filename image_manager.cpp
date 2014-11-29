@@ -47,6 +47,43 @@ void ImageManager::setSpeed(double speedFrom0To100)
     image_widget->movie()->start();
 }
 
+void ImageManager::faster()
+{
+    double speed = getSpeed();
+    if(speed > 100)
+    {
+        if(speed >= 1000)
+            speed += 1000;
+        else
+            speed += 100;
+    } else {
+        if(speed >= 60)
+            speed += 10;
+        else
+            speed += 5;
+    }
+    main_window->setSpeed(speed);
+}
+
+void ImageManager::slower()
+{
+    double speed = getSpeed();
+    if(speed > 100) {
+        if(speed >= 1000)
+            speed -= 500;
+        else
+            speed -= 50;
+    }else {
+        if(speed > 60)
+            speed -= 5;
+        else if(speed > 5)
+            speed -= 2.5;
+        else
+            return;
+    }
+    main_window->setSpeed(speed);
+}
+
 bool ImageManager::togglePause()
 {
     image_widget->movie()->setPaused(image_widget->movie()->state()!=QMovie::Paused);

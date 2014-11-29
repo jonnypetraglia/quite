@@ -17,6 +17,8 @@ class MediaManager : public QObject {
     Q_OBJECT
 public:
     virtual void load(QString) = 0;
+    virtual void faster() = 0;
+    virtual void slower() = 0;
     virtual void setSpeed(double) = 0;
     virtual double getSpeed() = 0;
     virtual bool togglePause() = 0;

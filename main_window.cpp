@@ -63,7 +63,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     random_order = new QCheckBox(tr("Random"));
     statusBar()->addWidget(random_order);
-    status_bar_widgets.append(slideshow_time);
+    status_bar_widgets.append(random_order);
 
     volume_dial = new QDial();
     volume_dial->setFocusPolicy(Qt::NoFocus);
@@ -193,9 +193,9 @@ void MainWindow::wheelEvent(QWheelEvent *event)
         //Zoom
     } else if (event->modifiers().testFlag(Qt::AltModifier)) {
         if(event->delta()>0)
-            faster();
+            current_manager->faster();
         else
-            slower();
+            current_manager->slower();
     } else {
         if(event->delta()<0)
             nextItem();
@@ -225,10 +225,10 @@ void MainWindow::keyPressEvent(QKeyEvent * e)
             prevItem();
             break;
         case Qt::Key_Plus:
-            faster();
+            current_manager->faster();
             break;
         case Qt::Key_Minus:
-            slower();
+            current_manager->slower();
             break;
         case Qt::Key_0:
             setSpeed();
@@ -272,40 +272,6 @@ void MainWindow::prevItem()
         list_index = list.size();
     --list_index;
     loadItem();
-}
-void MainWindow::faster()
-{
-    double speed = current_manager->getSpeed();
-    if(speed >= 100)
-    {
-        if(speed >= 1000)
-            speed += 1000;
-        else
-            speed += 100;
-    } else {
-        if(speed >= 60)
-            speed += 10;
-        else
-            speed += 5;
-    }
-    setSpeed(speed);
-}
-
-void MainWindow::slower()
-{
-    qDebug() << "slower";
-    double speed = current_manager->getSpeed();
-    if(speed > 100)
-        speed -= 50;
-    else {
-        if(speed > 60)
-            speed -= 10;
-        else if(speed > 5)
-            speed -= 5;
-        else
-            return;
-    }
-    setSpeed(speed);
 }
 
 void MainWindow::setSpeed(double d)

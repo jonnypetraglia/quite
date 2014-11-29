@@ -40,6 +40,7 @@ public:
 
 
     void loadFolder(QString folder, QString file = "");
+    void setSpeed(double d=100);
     
 private:
     //Ui::MainWindow *ui;
@@ -66,10 +67,6 @@ private:
     // Item Related
     void loadItem();
     void clearItem();
-    // Speed related
-    void faster();
-    void slower();
-    void setSpeed(double d=100);
     // SlideshowRelated
     void startSlideshow();
     void stopSlideshow();

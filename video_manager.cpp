@@ -40,6 +40,40 @@ void VideoManager::setSpeed(double speedFrom0To100)
     qDebug() << "speed " << speedFrom0To100;
 }
 
+void VideoManager::faster()
+{
+    double speed = getSpeed();
+    if(speed > 100)
+    {
+        if(speed >= 250)
+            return;
+        else
+            speed += 10;
+    } else {
+        if(speed >= 60)
+            speed += 5;
+        else
+            speed += 2;
+    }
+    main_window->setSpeed(speed);
+}
+
+void VideoManager::slower()
+{
+    double speed = getSpeed();
+    if(speed > 100)
+        speed -= 10;
+    else {
+        if(speed > 60)
+            speed -= 5;
+        else if(speed > 5)
+            speed -= 2;
+        else
+            return;
+    }
+    main_window->setSpeed(speed);
+}
+
 bool VideoManager::togglePause()
 {
     if(video_player->state()==QMediaPlayer::PausedState)
