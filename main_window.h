@@ -9,6 +9,7 @@
 #include <QDial>
 #include <QTimer>
 #include <QMenuBar>
+#include <QWidgetList>
 
 #include <QDir>
 #include <QMimeData>
@@ -43,8 +44,6 @@ public:
 private:
     //Ui::MainWindow *ui;
     const int WIDTH = 731, HEIGHT = 518;
-    QMenuBar* menu_bar;
-
     QStringList list;
     int list_index;
     QString folder;
@@ -53,10 +52,10 @@ private:
     VideoManager* video_manager;
     MediaManager* current_manager = NULL;
 
-    QStatusBar* status_bar;
+    QVector<QWidget*> status_bar_widgets;
     QLabel* status_bar_text;
     QLabel* status_bar_speed;
-    QPushButton* start_slideshow;
+    QPushButton* slideshow_button;
     QCheckBox* random_order;
     QSpinBox* slideshow_time;
     QDial* volume_dial;
@@ -76,7 +75,8 @@ private:
     void stopSlideshow();
 
 public slots:
-    void browseForFolder(QAction*);
+    void browseForFile();
+    void browseForFolder();
     void slideshowButton();
     void reloadFolder();
     void prevItem();

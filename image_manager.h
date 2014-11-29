@@ -12,11 +12,11 @@ class ImageManager : public MediaManager
 {
     Q_OBJECT
 public:
-    ImageManager(MainWindow*, QStatusBar*, const char*);
-    ~ImageManager();
+    ImageManager(MainWindow*);
     void load(QString);
     void setSpeed(double);
     void resize(QResizeEvent*);
+    bool togglePause();
 
     double getSpeed() {
         return image_widget->movie()->speed();

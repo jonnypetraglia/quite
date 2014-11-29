@@ -3,12 +3,12 @@
 
 #include <QDebug>
 
-#include <QMainWindow>
 #include <QStatusBar>
 #include <QStringList>
 #include <QCheckBox>
 #include <QString>
 #include <QResizeEvent>
+#include <QVector>
 
 
 class MainWindow;
@@ -16,19 +16,10 @@ class MainWindow;
 class MediaManager : public QObject {
     Q_OBJECT
 public:
-    ~MediaManager() {
-        qDebug() << "Destroying mediaManager";
-        /*
-        for(int i=0; i<FILETYPES.length(); i++)
-            delete filetype_checks[i];
-        delete filetype_checks;
-        */
-        qDebug() << "Destroyed mediaManager";
-    }
-
     virtual void load(QString) = 0;
     virtual void setSpeed(double) = 0;
     virtual double getSpeed() = 0;
+    virtual bool togglePause() = 0;
     virtual void clear() = 0;
     virtual void setVolume(double) = 0;
     virtual void resize(QResizeEvent*) = 0;
@@ -51,20 +42,24 @@ public:
         filetype_checks[ind]->setChecked(true);
     }
 
-    void initChecks(QStatusBar* status_bar, const char* filetype_check_slot) {
-        filetype_checks = new QCheckBox*[FILETYPES.length()];
-        for(int i=0; i<FILETYPES.length(); i++)
-        {
-            status_bar->addWidget(filetype_checks[i] = new QCheckBox(FILETYPES[i].right(FILETYPES[i].length()-2)));
-            filetype_checks[i]->setChecked(true);
-            filetype_checks[i]->setFocusPolicy(Qt::NoFocus);
-            QMainWindow::connect(filetype_checks[i], SIGNAL(clicked()), (QMainWindow*)main_window, filetype_check_slot);
-        }
+    QVector<QCheckBox*> getChecks() {
+        return filetype_checks;
     }
 
 protected:
+    void initChecks() {
+        filetype_checks.reserve(FILETYPES.length());
+        for(QString filetype : FILETYPES)
+        {
+            QCheckBox* c = new QCheckBox(filetype.right(filetype.length()-2));
+            c->setChecked(true);
+            c->setFocusPolicy(Qt::NoFocus);
+            filetype_checks.append(c);
+        }
+    }
+
     QStringList FILETYPES;
-    QCheckBox **filetype_checks;
+    QVector<QCheckBox*> filetype_checks;
     MainWindow *main_window;
 };
 

@@ -11,11 +11,12 @@ class VideoManager : public MediaManager
 {
     Q_OBJECT
 public:
-    VideoManager(MainWindow*, QStatusBar*, const char*);
+    VideoManager(MainWindow*);
     ~VideoManager();
     void load(QString);
     void setSpeed(double);
     void resize(QResizeEvent*);
+    bool togglePause();
 
     double getSpeed() {
         return video_player->playbackRate() * 100;

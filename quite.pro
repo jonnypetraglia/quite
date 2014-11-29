@@ -10,21 +10,23 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = quite
+TARGET = Quite
 TEMPLATE = app
 
 
-SOURCES += main.cpp\
-        mainwindow.cpp\
-        quca.hpp\
-        image_manager.cpp\
-        video_manager.cpp
+SOURCES  += main.cpp\
+            main_window.cpp\
+            quca.hpp\
+            image_manager.cpp\
+            video_manager.cpp
 
-HEADERS  += mainwindow.h\
+HEADERS  += main_window.h\
             media_manager.h\
             image_manager.h\
             video_manager.h
 
-FORMS    += mainwindow.ui
+FORMS    +=
 
 QT += multimedia multimediawidgets
+
+OTHER_FILES += Todo.txt

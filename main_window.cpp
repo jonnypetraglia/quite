@@ -1,4 +1,4 @@
-#include "mainwindow.h"
+#include "main_window.h"
 #include "ui_mainwindow.h"
 #include "quca.hpp"
 
@@ -19,67 +19,79 @@ MainWindow::MainWindow(QWidget *parent) :
     layout()->setSpacing(6);
     qDebug() << "X";
 
-    menu_bar = new QMenuBar(this);
-    menu_bar->setGeometry(0, 0, WIDTH, 22);
-    status_bar = new QStatusBar(this);
+    // Setup the managers
+    image_manager = new ImageManager(this);
+    video_manager = new VideoManager(this);
 
-    qDebug() << "Menu Bar Created";
+    // Setup the Menu
+    //this->menuBar()->setGeometry(0, 0, WIDTH, 22);
+    QMenu* browse_menu = menuBar()->addMenu(tr("&Browse"));
+    QAction *file = browse_menu->addAction(tr("F&ile")),
+             *folder = browse_menu->addAction(tr("F&older"));
+    connect(file, SIGNAL(triggered()), this, SLOT(browseForFile()));
+    connect(folder, SIGNAL(triggered()), this, SLOT(browseForFolder()));
+    //*/
 
-    image_manager = new ImageManager(this, status_bar, SLOT(reloadFolder()));
-    video_manager = new VideoManager(this, status_bar, SLOT(reloadFolder()));
+    // Setup the StatusBar
+    for(QCheckBox* check : image_manager->getChecks()) {
+        QMainWindow::connect(check, SIGNAL(clicked()), this, SLOT(reloadFolder()));
+        statusBar()->addWidget(check);
+        status_bar_widgets.append(check);
+    }
+    for(QCheckBox* check : video_manager->getChecks()) {
+        QMainWindow::connect(check, SIGNAL(clicked()), this, SLOT(reloadFolder()));
+        statusBar()->addWidget(check);
+        status_bar_widgets.append(check);
+    }
 
-    qDebug() << "Managers created";
+    status_bar_speed = new QLabel();
+    statusBar()->addWidget(status_bar_speed);
+    status_bar_widgets.append(status_bar_speed);
 
-    QWidget* central = new QWidget(this);
-    this->setCentralWidget(central);
+    slideshow_button = new QPushButton(tr("Slide"));
+    slideshow_button->setFocusPolicy(Qt::NoFocus);
+    statusBar()->addWidget(slideshow_button);
+    status_bar_widgets.append(slideshow_button);
 
-    qDebug() << "Layout init";
-
-    // Add sum menu items
-    QMenu* browse = menu_bar->addMenu("Browse");
-    connect(browse, SIGNAL(triggered(QAction*)), this, SLOT(browseForFolder(QAction*)));
-
-    // Add sum widgets
-    status_bar->addWidget(status_bar_speed = new QLabel());
-
-    status_bar->addWidget(start_slideshow = new QPushButton("Slide"));
-    start_slideshow->setFocusPolicy(Qt::NoFocus);
-
-    status_bar->addWidget(slideshow_time = new QSpinBox());
+    slideshow_time = new QSpinBox();
     slideshow_time->setValue(3);
     slideshow_time->setSuffix("s");
     slideshow_time->setRange(1, 60);
     slideshow_time->setFocusPolicy(Qt::NoFocus);
+    statusBar()->addWidget(slideshow_time);
+    status_bar_widgets.append(slideshow_time);
 
-    status_bar->addWidget(random_order = new QCheckBox("Random"));
+    random_order = new QCheckBox(tr("Random"));
+    statusBar()->addWidget(random_order);
+    status_bar_widgets.append(slideshow_time);
 
-    status_bar->addWidget(status_bar_text = new QLabel(), 1);
-    status_bar_text->setAlignment(Qt::AlignRight);
-
-    status_bar->addWidget(volume_dial = new QDial());
+    volume_dial = new QDial();
     volume_dial->setFocusPolicy(Qt::NoFocus);
     volume_dial->setMinimum(0);
     volume_dial->setMaximum(100);
     volume_dial->setNotchesVisible(true);
     volume_dial->setSingleStep(5);
+    volume_dial->setBaseSize(20, 20);
+    volume_dial->setMaximumSize(QSize(30,30));
     volume_dial->setWrapping(false); //WTF does this do?
+    statusBar()->addWidget(volume_dial);
+    status_bar_widgets.append(volume_dial);
 
-    qDebug() << "Connecting signals to slots";
+    status_bar_text = new QLabel();
+    status_bar_text->setAlignment(Qt::AlignRight);
+    statusBar()->addWidget(status_bar_text);
+    status_bar_widgets.append(status_bar_text);
 
     connect(random_order, SIGNAL(clicked()), this, SLOT(reloadFolder()));
-    connect(start_slideshow, SIGNAL(clicked()), this, SLOT(slideshowButton()));
+    connect(slideshow_button, SIGNAL(clicked()), this, SLOT(slideshowButton()));
     connect(slide_timer, SIGNAL(timeout()), this, SLOT(nextItemWhenConvenient()));
     connect(slideshow_time, SIGNAL(valueChanged(int)), this, SLOT(restartSlideshow(int)));
     connect(volume_dial, SIGNAL(valueChanged(int)), this, SLOT(volumeChange(int)));
 
-    qDebug() << "Adding Widgets";
 
+    for(QWidget* widget : status_bar_widgets)
+        widget->setDisabled(true);
 
-    //this->layout()->addWidget(central);
-    this->layout()->addWidget(menu_bar);
-    //this->layout()->addItem(tool_bar);
-    //this->layout()->addWidget(status_bar);
-    //*/
     qDebug() << "mainWindow created";
 }
 
@@ -89,17 +101,6 @@ MainWindow::~MainWindow()
     qDebug() << "Destroying mainWindow";
 
     delete slide_timer;
-    delete menu_bar;
-    delete status_bar;
-    delete image_manager;
-    delete video_manager;
-    delete status_bar_speed;
-    delete start_slideshow;
-    delete slideshow_time;
-    delete random_order;
-    delete status_bar_text;
-    delete volume_dial;
-    //delete ui;
 
     qDebug() << "Destroyed mainWindow";
 }
@@ -111,10 +112,10 @@ void MainWindow::slideshowButton()
     qDebug() << "Slideshow Button";
     if(slide_timer->isActive()) {
         stopSlideshow();
-        start_slideshow->setText("Slide");
+        slideshow_button->setText("Slide");
     } else {
         startSlideshow();
-        start_slideshow->setText("Stop");
+        slideshow_button->setText("Stop");
     }
 }
 
@@ -163,12 +164,25 @@ void MainWindow::loadFolder(QString folder, QString file)
     else
         list_index = list.indexOf(file,0);
 
+    for(QWidget* widget : status_bar_widgets)
+        widget->setDisabled(false);
+
     loadItem();
 }
 
-void MainWindow::browseForFolder(QAction* action)
+void MainWindow::browseForFile()
 {
-    loadFolder(QFileDialog::getExistingDirectory());
+    QString file = QFileDialog::getOpenFileName(this); //TODO filetype filtering
+    QFileInfo fileinfo(file);
+    if(fileinfo.isDir())
+        loadFolder(fileinfo.filePath());
+    else
+        loadFolder(fileinfo.absoluteDir().absolutePath(), fileinfo.fileName());
+}
+
+void MainWindow::browseForFolder()
+{
+    loadFolder(QFileDialog::getExistingDirectory(this));
 }
 
 
@@ -202,7 +216,6 @@ void MainWindow::mousePressEvent(QMouseEvent * me)
 
 void MainWindow::keyPressEvent(QKeyEvent * e)
 {
-    qDebug() << "keyPressEvent";
     e->accept();
     switch (e->key()) {
         case Qt::Key_Right:
@@ -228,6 +241,12 @@ void MainWindow::keyPressEvent(QKeyEvent * e)
             return;
         case Qt::Key_Space:
             slideshowButton();
+            return;
+        case Qt::Key_P:
+            if(current_manager->togglePause())
+                stopSlideshow();
+            else if(slide_timer->isActive())
+                restartSlideshow();
             return;
         default:
             return;
@@ -332,7 +351,7 @@ void MainWindow::clearItem()
 // Load the file that is marked as the current file
 void MainWindow::loadItem()
 {
-    qDebug() << "Loading Item";
+    qDebug() << "Loading Item at " << list_index;
     QString file = folder + "/" + list.at(list_index);
     QFileInfo fileInfo = QFileInfo(file);
     this->setWindowTitle(fileInfo.fileName());

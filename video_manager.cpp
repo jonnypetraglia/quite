@@ -1,7 +1,7 @@
 #include "video_manager.h"
-#include "mainwindow.h"
+#include "main_window.h"
 
-VideoManager::VideoManager(MainWindow* window, QStatusBar* status_bar, const char* filetype_check_slot)
+VideoManager::VideoManager(MainWindow* window)
 {
     main_window = window;
     video_player = new QMediaPlayer;
@@ -11,15 +11,13 @@ VideoManager::VideoManager(MainWindow* window, QStatusBar* status_bar, const cha
 
     FILETYPES << "*.mov" << "*.mp4"; //<< "*.webm"
 
-    initChecks(status_bar, filetype_check_slot);
+    initChecks();
 }
 
 VideoManager::~VideoManager()
 {
-    qDebug() << "Destroying videoManager";
-    delete video_player;
-    delete video_widget;
-    qDebug() << "Destroyed videoManager";
+    //delete video_player;
+    //delete video_widget;
 }
 
 
@@ -40,6 +38,15 @@ void VideoManager::setSpeed(double speedFrom0To100)
 {
     video_player->setPlaybackRate(speedFrom0To100 / 100);
     qDebug() << "speed " << speedFrom0To100;
+}
+
+bool VideoManager::togglePause()
+{
+    if(video_player->state()==QMediaPlayer::PausedState)
+        video_player->play();
+    else
+        video_player->pause();
+    return video_player->state()==QMediaPlayer::PausedState;
 }
 
 void VideoManager::resize(QResizeEvent *qre)

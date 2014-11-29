@@ -1,7 +1,7 @@
 #include "image_manager.h"
-#include "mainwindow.h"
+#include "main_window.h"
 
-ImageManager::ImageManager(MainWindow* window, QStatusBar* status_bar, const char* filetype_check_slot)
+ImageManager::ImageManager(MainWindow* window)
 {
     main_window = window;
     image_widget = new QLabel;
@@ -17,16 +17,9 @@ ImageManager::ImageManager(MainWindow* window, QStatusBar* status_bar, const cha
     image_widget->movie()->setScaledSize(QSize(100,100));
 
     FILETYPES << "*.jpg" << "*.png" << "*.gif";
-    initChecks(status_bar, filetype_check_slot);
+    initChecks();
 
     QMainWindow::connect(image_widget->movie(), SIGNAL(frameChanged(int)), (ImageManager*)this, SLOT(movieFinished(int)));
-}
-
-ImageManager::~ImageManager()
-{
-    qDebug() << "Destroying imageManager";
-    delete image_widget;
-    qDebug() << "Destroyed imageManager";
 }
 
 void ImageManager::load(QString file)
@@ -47,6 +40,27 @@ void ImageManager::load(QString file)
     setSpeed(100);
 }
 
+void ImageManager::setSpeed(double speedFrom0To100)
+{
+    qDebug() << "speed " << speedFrom0To100;
+    image_widget->movie()->setSpeed(speedFrom0To100);
+    image_widget->movie()->start();
+}
+
+bool ImageManager::togglePause()
+{
+    image_widget->movie()->setPaused(image_widget->movie()->state()!=QMovie::Paused);
+    return image_widget->movie()->state()==QMovie::Paused;
+}
+
+void ImageManager::resize(QResizeEvent *qre)
+{
+    QSize newsize = img_size;
+    newsize.scale(qre->size().width(), qre->size().height(), Qt::KeepAspectRatio);
+    image_widget->movie()->setScaledSize(newsize);
+    image_widget->movie()->start();
+}
+
 void ImageManager::next()
 {
     if(movie_is_finished)
@@ -63,19 +77,4 @@ void ImageManager::movieFinished(int frame)
         movie_is_finished = true;
         main_window->nextItemWhenConvenient();
     }
-}
-
-void ImageManager::setSpeed(double speedFrom0To100)
-{
-    qDebug() << "speed " << speedFrom0To100;
-    image_widget->movie()->setSpeed(speedFrom0To100);
-    image_widget->movie()->start();
-}
-
-void ImageManager::resize(QResizeEvent *qre)
-{
-    QSize newsize = img_size;
-    newsize.scale(qre->size().width(), qre->size().height(), Qt::KeepAspectRatio);
-    image_widget->movie()->setScaledSize(newsize);
-    image_widget->movie()->start();
 }
