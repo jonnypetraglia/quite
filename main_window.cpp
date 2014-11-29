@@ -141,13 +141,25 @@ void MainWindow::loadFolder(QString folder, QString file)
     if(filetypes_want.size()==0) {
         clearItem(); return; }
 
+    // Check to see if the file we want is the same as is already loaded to avoid reloading it.
+    bool sameFile =
+            //Same folder
+            this->folder==folder &&
+            // Same file
+            (
+                list_index>0 &&
+                list.length()>list_index &&
+                file==list.at(list_index)
+            ) &&
+            // Extension checkbox for this file is checked
+            filetypes_want.contains(QString("*.").append(QFileInfo(file).suffix()));
+
     // Set the folder & load the files
     this->folder = folder;
-    QDir _folder(folder);
-    list = _folder.entryList(filetypes_want);
+    list = QDir(folder).entryList(filetypes_want);
 
     // If there are no files
-    if(list.size()==0) {
+    if(list.length()==0) {
         clearItem(); return; }
 
     qDebug() << "Files: " << list.size();
@@ -157,6 +169,12 @@ void MainWindow::loadFolder(QString folder, QString file)
         std::random_shuffle(list.begin(), list.end());
     else
         QUnicodeCollationAlgorithm::collatorKeySort(list);
+
+    // Determine if this was a reload, in which case we should not reload the current item
+    if(sameFile) {
+        qDebug() << "Reloading same file, so not re-starting it";
+        return;
+    }
 
     // Set the current file's index in the list
     if(file=="" || list.indexOf(file,0)<0)
