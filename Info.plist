@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>NSHumanReadableCopyright</key>
+    <string>Copyright &copy; 2014 Qweex LLC, released under the ??? License</string>
+
+    <key>CFBundleShortVersionString</key>
+    <string>@SHORT_VERSION@</string>
+    <key>CFBundleIconFile</key>
+    <string>@ICON@</string>
+    <key>CFBundleExecutable</key>
+    <string>@EXECUTABLE@</string>
+
+    <key>CFBundleName</key>
+    <string>Quite</string>
+    <key>CFBundleIdentifier</key>
+    <string>com.qweex.quite</string>
+    <key>CFBundleDevelopmentRegion</key>
+    <string>English</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>LSApplicationCategoryType</key>
+    <string>public.app-category.utilities</string>
+    <key>LSMinimumSystemVersion</key>
+    <string>10.6.6</string>
+
+    <key>CFBundleSignature</key>
+    <string>????</string>
+</dict>
+</plist>
