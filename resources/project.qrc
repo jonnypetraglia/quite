@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/logo">
+        <file>../LICENSE.QPL</file>
         <file>images/logo_16.png</file>
         <file>images/logo_24.png</file>
         <file>images/logo_32.png</file>
@@ -10,14 +11,8 @@
         <file>images/logo_192.png</file>
         <file>images/logo_256.png</file>
         <file>images/logo_512.png</file>
+        <file>images/logo_white.png</file>
         <file>images/logo.icns</file>
         <file>images/logo.ico</file>
-    </qresource>
-    <qresource prefix="/res">
-        <file>LICENSE.QPL</file>
-        <file>images/stop.png</file>
-        <file>images/qweex.png</file>
-        <file>images/muhface.jpg</file>
-        <file>images/clipboard.png</file>
     </qresource>
 </RCC>

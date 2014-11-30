@@ -32,9 +32,7 @@ void ImageManager::load(QString file)
     image_widget->movie()->setFileName(file);
 
     img_size = QPixmap(file).size();
-    QSize newsize = img_size;
-    newsize.scale(main_window->size().width()-100, main_window->size().height()-100, Qt::KeepAspectRatio);
-    image_widget->movie()->setScaledSize(newsize);
+    resize(new QResizeEvent(main_window->size(), main_window->size()));
 
     movie_is_finished = image_widget->movie()->frameCount()==1;
     setSpeed(100);
@@ -93,7 +91,8 @@ bool ImageManager::togglePause()
 void ImageManager::resize(QResizeEvent *qre)
 {
     QSize newsize = img_size;
-    newsize.scale(qre->size().width(), qre->size().height(), Qt::KeepAspectRatio);
+    //newsize.scale(qre->size().width(), qre->size().height(), Qt::KeepAspectRatio);
+    newsize.scale(main_window->size().width()-100, main_window->size().height()-100, Qt::KeepAspectRatio);
     image_widget->movie()->setScaledSize(newsize);
     image_widget->movie()->start();
 }

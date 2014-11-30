@@ -1,6 +1,10 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "image_manager.h"
+#include "video_manager.h"
+#include "qweex/qweex_main_window.h"
+
 #include <QDebug>
 
 #include <QMainWindow>
@@ -14,15 +18,10 @@
 #include <QDir>
 #include <QMimeData>
 #include <QFileDialog>
+#include <QLayout>
+#include <QToolBar>
 
-#include "image_manager.h"
-#include "video_manager.h"
-
-namespace Ui {
-class MainWindow;
-}
-
-class MainWindow : public QMainWindow
+class MainWindow : public Qweex::MainWindow
 {
     Q_OBJECT
     
@@ -59,7 +58,6 @@ public slots:
     }
 
 private:
-    //Ui::MainWindow *ui;
     const int WIDTH = 731, HEIGHT = 518;
     QStringList list;
     int list_index;

@@ -1,0 +1,6 @@
+The main "dapper" logo is courtesy of Webalys:
+    http://www.webalys.com/
+    https://www.iconfinder.com/icons/185111/monocle_mustache_streamline_icon
+
+Clipboard icon:
+    https://github.com/yusukekamiyamane/fugue-icons/blob/master/icons/clipboard--arrow.png

@@ -1,6 +1,8 @@
+#include "project.h"
+#include "main_window.h"
+
 #include <QDebug>
 
-#include "main_window.h"
 #include <QApplication>
 #include <QFileInfo>
 #include <QDir>
@@ -11,7 +13,12 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    QCoreApplication::setApplicationName("Quite");
+    a.setApplicationName(APP_NAME);
+    a.setApplicationDisplayName(APP_NAME);
+    a.setOrganizationName(COPYRIGHT_HOLDER);
+    a.setOrganizationDomain(COPYRIGHT_DOMAIN);
+
+    a.setWindowIcon(QIcon(":/logo/images/logo_512.png"));
 
     MainWindow w;
 

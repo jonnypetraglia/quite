@@ -1,56 +1,56 @@
 #include "main_window.h"
-#include "ui_mainwindow.h"
 #include "quca.hpp"
 
 MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent)
-    //, ui(new Ui::MainWindow)
+    Qweex::MainWindow(parent),
+    slide_timer(new QTimer())
 {
-    setWindowTitle("Quite");
-    slide_timer = new QTimer();
-
     qDebug() << "Main Window Started";
-    setGeometry(QRect(0, 0, WIDTH, HEIGHT));
     QSizePolicy pol(QSizePolicy::Preferred, QSizePolicy::Preferred);
     pol.setHorizontalStretch(0);
     pol.setVerticalStretch(0);
+    setWindowTitle("Quite");
+    setGeometry(QRect(0, 0, WIDTH, HEIGHT));
     setSizePolicy(pol);
     layout()->setMargin(11);
     layout()->setSpacing(6);
-    qDebug() << "X";
+    QMainWindow::setUnifiedTitleAndToolBarOnMac(true); //TODO: Should I?
+
+    QToolBar* tool_bar = new QToolBar(this);
+    this->addToolBar(Qt::BottomToolBarArea, tool_bar);
+    tool_bar->setFloatable(false); //TODO: Should I?
 
     // Setup the managers
     image_manager = new ImageManager(this);
     video_manager = new VideoManager(this);
 
     // Setup the Menu
-    //this->menuBar()->setGeometry(0, 0, WIDTH, 22);
-    QMenu* browse_menu = menuBar()->addMenu(tr("&Browse"));
+    QMenu* browse_menu = new QMenu(tr("&Browse"));
     QAction *file = browse_menu->addAction(tr("F&ile")),
              *folder = browse_menu->addAction(tr("F&older"));
     connect(file, SIGNAL(triggered()), this, SLOT(browseForFile()));
     connect(folder, SIGNAL(triggered()), this, SLOT(browseForFolder()));
-    //*/
+    menuBar()->insertMenu(menuBar()->actions().first(), browse_menu);
 
-    // Setup the StatusBar
+    // Setup the ToolBar
     for(QCheckBox* check : image_manager->getChecks()) {
         QMainWindow::connect(check, SIGNAL(clicked()), this, SLOT(reloadFolder()));
-        statusBar()->addWidget(check);
+        tool_bar->addWidget(check);
         status_bar_widgets.append(check);
     }
     for(QCheckBox* check : video_manager->getChecks()) {
         QMainWindow::connect(check, SIGNAL(clicked()), this, SLOT(reloadFolder()));
-        statusBar()->addWidget(check);
+        tool_bar->addWidget(check);
         status_bar_widgets.append(check);
     }
 
     status_bar_speed = new QLabel();
-    statusBar()->addWidget(status_bar_speed);
+    tool_bar->addWidget(status_bar_speed);
     status_bar_widgets.append(status_bar_speed);
 
     slideshow_button = new QPushButton(tr("Slide"));
     slideshow_button->setFocusPolicy(Qt::NoFocus);
-    statusBar()->addWidget(slideshow_button);
+    tool_bar->addWidget(slideshow_button);
     status_bar_widgets.append(slideshow_button);
 
     slideshow_time = new QSpinBox();
@@ -58,11 +58,11 @@ MainWindow::MainWindow(QWidget *parent) :
     slideshow_time->setSuffix("s");
     slideshow_time->setRange(1, 60);
     slideshow_time->setFocusPolicy(Qt::NoFocus);
-    statusBar()->addWidget(slideshow_time);
+    tool_bar->addWidget(slideshow_time);
     status_bar_widgets.append(slideshow_time);
 
     random_order = new QCheckBox(tr("Random"));
-    statusBar()->addWidget(random_order);
+    tool_bar->addWidget(random_order);
     status_bar_widgets.append(random_order);
 
     volume_dial = new QDial();
@@ -74,12 +74,12 @@ MainWindow::MainWindow(QWidget *parent) :
     volume_dial->setBaseSize(20, 20);
     volume_dial->setMaximumSize(QSize(30,30));
     volume_dial->setWrapping(false); //WTF does this do?
-    statusBar()->addWidget(volume_dial);
+    tool_bar->addWidget(volume_dial);
     status_bar_widgets.append(volume_dial);
 
     status_bar_text = new QLabel();
     status_bar_text->setAlignment(Qt::AlignRight);
-    statusBar()->addWidget(status_bar_text);
+    tool_bar->addWidget(status_bar_text);
     status_bar_widgets.append(status_bar_text);
 
     connect(random_order, SIGNAL(clicked()), this, SLOT(reloadFolder()));
@@ -89,8 +89,17 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(volume_dial, SIGNAL(valueChanged(int)), this, SLOT(volumeChange(int)));
 
 
+    // Disable all the widgets until a folder is loaded
     for(QWidget* widget : status_bar_widgets)
         widget->setDisabled(true);
+
+    QLabel* dapper_image = new QLabel;
+    dapper_image->setStyleSheet("background-color: #333333");
+    dapper_image->setBackgroundRole(QPalette::Base);
+    dapper_image->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+    dapper_image->setPixmap(QPixmap(":logo/images/logo_white.png"));
+    dapper_image->setAlignment(Qt::AlignCenter);
+    setCentralWidget(dapper_image);
 
     qDebug() << "mainWindow created";
 }
@@ -210,6 +219,8 @@ void MainWindow::browseForFolder()
 
 void MainWindow::wheelEvent(QWheelEvent *event)
 {
+    if(folder=="")
+        return;
     qDebug() << "WheelEvent";
     if (event->modifiers().testFlag(Qt::ControlModifier)) {
         //Zoom
@@ -238,6 +249,8 @@ void MainWindow::mousePressEvent(QMouseEvent * me)
 
 void MainWindow::keyPressEvent(QKeyEvent * e)
 {
+    if(folder=="")
+        return;
     e->accept();
     switch (e->key()) {
         case Qt::Key_Right:

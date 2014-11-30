@@ -1,8 +1,18 @@
-#include "qweex_main_window.h"
+#include "qweex/qweex_main_window.h"
 
-QweexMainWindow::QweexMainWindow(QWidget *parent) :
+Qweex::MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
 {
+    about_window = new Qweex::AboutWindow(this);
+    //connect(about_window, SIGNAL(finished(int)), about_window, SLOT(close()));
+
+    #ifdef SUPPORT_THE_DEV
+    Purchase::readLicenseInfo();
+    if(Purchase::firstTime && !Purchase::keyIsValid())
+        Purchase::beg();
+    #endif
+
+
     #ifdef __APPLE__
     setWindowIcon(QIcon());
     {
@@ -10,7 +20,7 @@ QweexMainWindow::QweexMainWindow(QWidget *parent) :
         {
             QAction* minimize = new QAction(tr("Minimize"),Window);
             minimize->setShortcut(tr("Ctrl+M"));
-            connect(minimize,SIGNAL(triggered()),this,SLOT(showMinimized());
+            connect(minimize,SIGNAL(triggered()),this,SLOT(showMinimized()));
             Window->addAction(minimize);
         }
         {
@@ -25,12 +35,12 @@ QweexMainWindow::QweexMainWindow(QWidget *parent) :
         QMenu* Help = new QMenu(tr("Help"));
         {
             QAction* about = new QAction(tr("About"), Help);
-            connect(about,SIGNAL(triggered()),this,SLOT(showAbout()));
+            connect(about, SIGNAL(triggered()), about_window,SLOT(show()));
             Help->addAction(about);
         }
         {
             QAction* license = new QAction(tr("License"), Help);
-            connect(license,SIGNAL(triggered()),this,SLOT(showLicense()));
+            connect(license, SIGNAL(triggered()), about_window, SLOT(showLicense()));
             Help->addAction(license);
         }
         this->menuBar()->addMenu(Help);
@@ -38,26 +48,8 @@ QweexMainWindow::QweexMainWindow(QWidget *parent) :
     #endif
 }
 
-
-
-void QweexMainWindow::showAbout()
-{
-    QString title = tr("About Curmudgeon ");
-    title.append(APP_VERSION);
-    if (!version_dialog) {
-        version_dialog = new version_dialog(this);
-        connect(m_versionDialog, SIGNAL(finished(int)), this, SLOT(destroyVersionDialog()));
-    }
-    m_versionDialog->show();
-}
-
-void QweexMainWindow::showLicense()
-{
-    VersionDialog::License();
-}
-
-
-void QweexMainWindow::haveReceivedLicenseConfirmation()
+#ifdef SUPPORT_THE_DEV
+void Qweex::MainWindow::haveReceivedLicenseConfirmation()
 {
     QAction *toRemove = menuBar()->actions().back();
     this->menuBar()->removeAction(toRemove);
@@ -66,5 +58,7 @@ void QweexMainWindow::haveReceivedLicenseConfirmation()
     QAction* key = new QAction(tr("View License Info"),Help);
     connect(key, SIGNAL(triggered()), this, SLOT(licenseKey()));
     Help->addAction(key);
-    qDebug() << "KEYEEEEE: " << Purchase::licenseKey;
+    //TODO
+    //qDebug() << "KEYEEEEE: " << Qweex::Purchase::license.key;
 }
+#endif
