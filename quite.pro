@@ -32,25 +32,24 @@ QT += multimedia multimediawidgets
 
 OTHER_FILES += LICENSE\
                 ICONS.txt\
-                resources/Info.plist\
-                resources/winicon.rc\
-                resources/images/*\
+                platform/*\
+                images/*\
                 qweex/purchase/.keep
 
 macx {
-    ICON = resources/images/logo.icns
+    ICON = images/logo.icns
     CONFIG += static
     LIBS += -dead_strip
 
     ## For submission to app store ##
     #QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.6
     #QMAKE_MAC_SDK = macosx
-    #QMAKE_INFO_PLIST = resources/Info.plist
+    #QMAKE_INFO_PLIST = platform/Info.plist
 }
 win32 {
-    ICON = resources/images/logo.ico
+    ICON = images/logo.ico
     LIBS += -lwinmm -lrpcrt4
-    RC_FILE = resources/winicon.rc
+    RC_FILE = platform/winicon.rc
 }
 linux-g++ {
 }
@@ -64,4 +63,4 @@ exists(qweex/purchase/purchase.h)
     QT += network
 }
 
-RESOURCES += qweex/qweex.qrc resources/project.qrc
+RESOURCES += qweex/qweex.qrc project.qrc

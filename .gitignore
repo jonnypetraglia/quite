@@ -1,3 +1,4 @@
 quite.pro.user.*
 qweex/purchase/*.cpp
 qweex/purchase/*.h
+*.ignore

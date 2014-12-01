@@ -14,4 +14,7 @@
         <file>images/logo.icns</file>
         <file>images/logo.ico</file>
     </qresource>
+    <qresource prefix="/">
+        <file>LICENSE</file>
+    </qresource>
 </RCC>
