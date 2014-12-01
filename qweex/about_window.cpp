@@ -4,20 +4,19 @@ Qweex::AboutWindow::AboutWindow(QWidget *parent) : QDialog(parent)
 {
     QString iconpath = ":/logo/images/logo_192.png";
 
-    QString version_string = QString(APP_NAME).append(" ").append(APP_VERSION);
     QString license_href = QString("<a href='").append(LICENSE_URL).append("'>").append(LICENSE_NAME).append("</a>");
 
     // We need to set the window icon explicitly here since for some reason the
     // application icon isn't used when the size of the dialog is fixed (at least not on X11/GNOME)
     setWindowIcon(QIcon(iconpath));
 
-    setWindowTitle(version_string);
+    setWindowTitle(tr("About %1").arg(APP_NAME));
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
     QGridLayout *layout = new QGridLayout(this);
     layout->setSizeConstraint(QLayout::SetFixedSize);
 
     QString description;
-    description.append("<h2><br/>").append(version_string).append("</h2>").append("\n")
+    description.append("<h2><br/>").append(APP_NAME).append(" ").append(APP_VERSION).append("</h2>").append("\n")
                .append("<p>").append(tr("Based on Qt")).append(" ").append(qVersion())
                 .append("(").append(QString::number(QSysInfo::WordSize)).append("-bit").append(buildPlatform()).append(")")
                .append("</p><p>").append("\n")
@@ -52,7 +51,7 @@ Qweex::AboutWindow::AboutWindow(QWidget *parent) : QDialog(parent)
     btc->setText(BTC);
     btc->setReadOnly(true);
     QPushButton* btcC = new QPushButton();
-    btcC->setIcon(QIcon(":/res/images/clipboard.png"));
+    btcC->setIcon(QIcon(":/qweex/images/clipboard.png"));
     btcL->setIndent(100);
     btcC->setFocusPolicy(Qt::NoFocus);
     crypto->addWidget(btcL,0, 0);
@@ -70,7 +69,7 @@ Qweex::AboutWindow::AboutWindow(QWidget *parent) : QDialog(parent)
     ltc->setText(LTC);
     ltc->setReadOnly(true);
     QPushButton* ltcC = new QPushButton();
-    ltcC->setIcon(QIcon(":/res/images/clipboard.png"));
+    ltcC->setIcon(QIcon(":/qweex/images/clipboard.png"));
     ltcL->setIndent(100);
     ltcC->setFocusPolicy(Qt::NoFocus);
     crypto->addWidget(ltcL,1, 0);

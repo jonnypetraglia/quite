@@ -1,6 +1,5 @@
 <RCC>
     <qresource prefix="/logo">
-        <file>../LICENSE.QPL</file>
         <file>images/logo_16.png</file>
         <file>images/logo_24.png</file>
         <file>images/logo_32.png</file>
