@@ -1,18 +1,18 @@
 #include "qweex/qweex_main_window.h"
 
 Qweex::MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent)
+    QMainWindow(parent),
+    about_window(new Qweex::AboutWindow(this))
 {
-    about_window = new Qweex::AboutWindow(this);
-    //connect(about_window, SIGNAL(finished(int)), about_window, SLOT(close()));
-
     #ifdef SUPPORT_THE_DEV
     Purchase::readLicenseInfo();
     if(Purchase::firstTime && !Purchase::keyIsValid())
         Purchase::beg();
     #endif
+}
 
-
+void Qweex::MainWindow::doPlatformSpecific()
+{
     #ifdef __APPLE__
     setWindowIcon(QIcon());
     {

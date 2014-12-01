@@ -101,6 +101,8 @@ MainWindow::MainWindow(QWidget *parent) :
     dapper_image->setAlignment(Qt::AlignCenter);
     setCentralWidget(dapper_image);
 
+
+    Qweex::MainWindow::doPlatformSpecific();
     qDebug() << "mainWindow created";
 }
 

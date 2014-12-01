@@ -21,7 +21,8 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
 
-signals:
+protected:
+    void doPlatformSpecific();
 
 public slots:
     #ifdef SUPPORT_THE_DEV
