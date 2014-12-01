@@ -2,16 +2,13 @@
 #include "main_window.h"
 
 VideoManager::VideoManager(MainWindow* window)
+    : MediaManager(QStringList() << "mov" << "mp4") //, << "webm")
 {
     main_window = window;
     video_player = new QMediaPlayer;
     video_widget = new QVideoWidget;
     video_player->setVideoOutput(video_widget);
     video_widget->setStyleSheet("QWidget { background-color: black; }");
-
-    FILETYPES << "*.mov" << "*.mp4"; //<< "*.webm"
-
-    initChecks();
 }
 
 VideoManager::~VideoManager()

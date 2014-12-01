@@ -2,6 +2,7 @@
 #include "main_window.h"
 
 ImageManager::ImageManager(MainWindow* window)
+    : MediaManager(QStringList() << "jpg" << "png" << "gif")
 {
     main_window = window;
     image_widget = new QLabel;
@@ -15,9 +16,6 @@ ImageManager::ImageManager(MainWindow* window)
     image_widget->setAlignment(Qt::AlignCenter);
     image_widget->setMovie(new QMovie);
     image_widget->movie()->setScaledSize(QSize(100,100));
-
-    FILETYPES << "*.jpg" << "*.png" << "*.gif";
-    initChecks();
 
     QMainWindow::connect(image_widget->movie(), SIGNAL(frameChanged(int)), (ImageManager*)this, SLOT(movieFinished(int)));
 }
