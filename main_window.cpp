@@ -3,68 +3,99 @@
 
 MainWindow::MainWindow(QWidget *parent) :
     Qweex::MainWindow(parent),
-    slide_timer(new QTimer())
+    sort_order(Name),
+    sort_reverse(No)
 {
     qDebug() << "Main Window Started";
+
+    /////////// Setup the layout & such ///////////
+    layout()->setMargin(11);
+    layout()->setSpacing(6);
     QSizePolicy pol(QSizePolicy::Preferred, QSizePolicy::Preferred);
     pol.setHorizontalStretch(0);
     pol.setVerticalStretch(0);
-    setWindowTitle("Quite");
-    setGeometry(QRect(0, 0, WIDTH, HEIGHT));
     setSizePolicy(pol);
-    layout()->setMargin(11);
-    layout()->setSpacing(6);
-    QMainWindow::setUnifiedTitleAndToolBarOnMac(true); //TODO: Should I?
+    setWindowTitle(APP_NAME);
+    setGeometry(QRect(0, 0, WIDTH, HEIGHT));
+    setUnifiedTitleAndToolBarOnMac(true); //TODO: Should I?
 
-    QToolBar* tool_bar = new QToolBar(this);
-    this->addToolBar(Qt::BottomToolBarArea, tool_bar);
-    tool_bar->setFloatable(false); //TODO: Should I?
+    /////////// Misc variables ///////////
+    slide_timer = new QTimer;
+    connect(slide_timer, SIGNAL(timeout()), this, SLOT(nextItemWhenConvenient()));
 
-    // Setup the managers
-    image_manager = new ImageManager(this);
-    video_manager = new VideoManager(this);
-
-    // Setup the Menu
+    /////////// Setup the Menu ///////////
     QMenu* browse_menu = new QMenu(tr("&Browse"));
     QAction *file = browse_menu->addAction(tr("F&ile")),
              *folder = browse_menu->addAction(tr("F&older"));
     connect(file, SIGNAL(triggered()), this, SLOT(browseForFile()));
     connect(folder, SIGNAL(triggered()), this, SLOT(browseForFolder()));
-    menuBar()->insertMenu(menuBar()->actions().first(), browse_menu);
+    menuBar()->addMenu(browse_menu);
 
-    // Setup the ToolBar
-    for(QCheckBox* check : image_manager->getChecks()) {
-        QMainWindow::connect(check, SIGNAL(clicked()), this, SLOT(reloadFolder()));
-        tool_bar->addWidget(check);
-        status_bar_widgets.append(check);
-    }
-    for(QCheckBox* check : video_manager->getChecks()) {
-        QMainWindow::connect(check, SIGNAL(clicked()), this, SLOT(reloadFolder()));
-        tool_bar->addWidget(check);
-        status_bar_widgets.append(check);
-    }
+    /////////// Create the managers ///////////
+    managers.append(new ImageManager(this));
+    managers.append(new VideoManager(this));
 
+    /////////// Setup the ToolBar ///////////
+    QWidget* SEPARATOR_SENTINEL = new QWidget;
+
+    // Init the toolbar
+    QToolBar* tool_bar = new QToolBar(this);
+    this->addToolBar(Qt::BottomToolBarArea, tool_bar); //:OPTIONS
+    tool_bar->setFloatable(false); //:OPTIONS
+
+    // Sort Order
+    QComboBox* sort_select = new QComboBox;
+    const QMetaObject &mo = MainWindow::staticMetaObject;
+    QMetaEnum metaEnum = mo.enumerator(mo.indexOfEnumerator("SORT"));
+    for(int i=0; i<metaEnum.keyCount(); i++)
+        sort_select->addItem(tr(metaEnum.key(i)));
+    connect(sort_select, SIGNAL(currentIndexChanged(int)), this, SLOT(changeSort(int)));
+    status_bar_widgets.append(sort_select);
+
+    // Filetypes
+        // Get ALL the filetypes!
+    QStringList all_filetypes;
+    for(MediaManager* manager :  managers)
+        for(QString s : manager->filetypes())
+            all_filetypes.append(s);
+    all_filetypes.sort(Qt::CaseInsensitive);
+        // Build the menu
+    filetypes_menu = new QMenu;
+    for(QString s : all_filetypes) {
+        QAction *ftype = new QAction(s, filetypes_menu);
+        ftype->setCheckable(true);
+        ftype->setChecked(true); //:OPTION
+        filetypes_menu->addAction(ftype);
+    }
+        // Build the button
+    filetypes = new QPushButton(tr("%n filetype(s)", "", all_filetypes.length()));
+    filetypes->setMenu(filetypes_menu);
+    status_bar_widgets.append(filetypes);
+
+    //
+    status_bar_widgets.append(SEPARATOR_SENTINEL);
+    //
+
+    // Speed label
     status_bar_speed = new QLabel();
-    tool_bar->addWidget(status_bar_speed);
     status_bar_widgets.append(status_bar_speed);
 
+    // Slideshow button
     slideshow_button = new QPushButton(tr("Slide"));
     slideshow_button->setFocusPolicy(Qt::NoFocus);
-    tool_bar->addWidget(slideshow_button);
+    connect(slideshow_button, SIGNAL(clicked()), this, SLOT(slideshowButton()));
     status_bar_widgets.append(slideshow_button);
 
+    // Slideshow time
     slideshow_time = new QSpinBox();
     slideshow_time->setValue(3);
     slideshow_time->setSuffix("s");
     slideshow_time->setRange(1, 60);
     slideshow_time->setFocusPolicy(Qt::NoFocus);
-    tool_bar->addWidget(slideshow_time);
+    connect(slideshow_time, SIGNAL(valueChanged(int)), this, SLOT(restartSlideshow(int)));
     status_bar_widgets.append(slideshow_time);
 
-    random_order = new QCheckBox(tr("Random"));
-    tool_bar->addWidget(random_order);
-    status_bar_widgets.append(random_order);
-
+    // Volume
     volume_dial = new QDial();
     volume_dial->setFocusPolicy(Qt::NoFocus);
     volume_dial->setMinimum(0);
@@ -74,24 +105,22 @@ MainWindow::MainWindow(QWidget *parent) :
     volume_dial->setBaseSize(20, 20);
     volume_dial->setMaximumSize(QSize(30,30));
     volume_dial->setWrapping(false); //WTF does this do?
-    tool_bar->addWidget(volume_dial);
+    connect(volume_dial, SIGNAL(valueChanged(int)), this, SLOT(volumeChange(int)));
     status_bar_widgets.append(volume_dial);
 
+    // Text
     status_bar_text = new QLabel();
     status_bar_text->setAlignment(Qt::AlignRight);
-    tool_bar->addWidget(status_bar_text);
     status_bar_widgets.append(status_bar_text);
 
-    connect(random_order, SIGNAL(clicked()), this, SLOT(reloadFolder()));
-    connect(slideshow_button, SIGNAL(clicked()), this, SLOT(slideshowButton()));
-    connect(slide_timer, SIGNAL(timeout()), this, SLOT(nextItemWhenConvenient()));
-    connect(slideshow_time, SIGNAL(valueChanged(int)), this, SLOT(restartSlideshow(int)));
-    connect(volume_dial, SIGNAL(valueChanged(int)), this, SLOT(volumeChange(int)));
-
-
     // Disable all the widgets until a folder is loaded
-    for(QWidget* widget : status_bar_widgets)
+    for(QWidget* widget : status_bar_widgets) {
         widget->setDisabled(true);
+        if(widget==SEPARATOR_SENTINEL)
+            tool_bar->addSeparator();
+        else
+            tool_bar->addWidget(widget);
+    }
 
     QLabel* dapper_image = new QLabel;
     dapper_image->setStyleSheet("background-color: #333333");
@@ -123,10 +152,10 @@ void MainWindow::slideshowButton()
     qDebug() << "Slideshow Button";
     if(slide_timer->isActive()) {
         stopSlideshow();
-        slideshow_button->setText("Slide");
+        slideshow_button->setText(tr("Slide"));
     } else {
         startSlideshow();
-        slideshow_button->setText("Stop");
+        slideshow_button->setText(tr("Stop"));
     }
 }
 
@@ -145,29 +174,38 @@ void MainWindow::loadFolder(QString folder, QString file)
 {
     qDebug() << "Loading Folder " << folder;
     QStringList filetypes_want;
-    image_manager->addCheckedFiletypesTo(filetypes_want);
-    video_manager->addCheckedFiletypesTo(filetypes_want);
+    bool filetypes_want_includes_file = false;
+    for(QAction* action : filetypes_menu->actions())
+    {
+        if(action->isChecked()) {
+            filetypes_want.append(QString("*.").append(action->text()));
+            if(action->text()==QFileInfo(file).suffix())
+                filetypes_want_includes_file = true;
+        }
+    }
 
     // If there are no checked filetypes
     if(filetypes_want.size()==0) {
         clearItem(); return; }
 
     // Check to see if the file we want is the same as is already loaded to avoid reloading it.
-    bool sameFile =
-            //Same folder
-            this->folder==folder &&
-            // Same file
-            (
-                list_index>0 &&
-                list.length()>list_index &&
-                file==list.at(list_index)
-            ) &&
-            // Extension checkbox for this file is checked
-            filetypes_want.contains(QString("*.").append(QFileInfo(file).suffix()));
+    bool sameFile = true; //Guilty until proven innocent
+    {
+        //Same folder
+        sameFile &= this->folder==folder;
+        // Same file
+        sameFile &= list_index>0 && list.length()>list_index && file==list.at(list_index);
+        // Extension checkbox for this file is checked
+        sameFile &= filetypes_want_includes_file;
+    }
 
     // Set the folder & load the files
     this->folder = folder;
-    list = QDir(folder).entryList(filetypes_want);
+    QDir folderQDir(folder);
+    folderQDir.setNameFilters(filetypes_want);
+    folderQDir.setFilter(QDir::Files | QDir::CaseSensitive | QDir::NoDotAndDotDot);
+    folderQDir.setSorting(QFlags<QDir::SortFlag>(sort_order) | QFlags<QDir::SortFlag>(sort_reverse));
+    list = folderQDir.entryList();
 
     // If there are no files
     if(list.length()==0) {
@@ -175,11 +213,16 @@ void MainWindow::loadFolder(QString folder, QString file)
 
     qDebug() << "Files: " << list.size();
 
-    // Sort (or anti-sort) the list
-    if(random_order->isChecked())
-        std::random_shuffle(list.begin(), list.end());
-    else
-        QUnicodeCollationAlgorithm::collatorKeySort(list);
+    // Post-Sort (if necessary)
+    switch(sort_order) {
+        case Name:
+            QUnicodeCollationAlgorithm::collatorKeySort(list);
+            break;
+        case Random:
+            std::random_shuffle(list.begin(), list.end());
+            break;
+    }
+
 
     // Determine if this was a reload, in which case we should not reload the current item
     if(sameFile) {
@@ -350,7 +393,8 @@ void MainWindow::restartSlideshow(int na)
 void MainWindow::clearItem()
 {
     qDebug() << "clearing item";
-    current_manager->clear();
+    if(current_manager!=NULL)
+        current_manager->clear();
     list_index = 0;
     this->setWindowTitle("<None>");
     status_bar_text->setText("<Folder empty>");
@@ -369,15 +413,17 @@ void MainWindow::loadItem()
     qDebug() << "Loading File " << file;
 
     goto_next_slide = false;
-    if(image_manager->hasExtension(fileInfo.suffix()))
-        current_manager = image_manager;
-    else if(video_manager->hasExtension(fileInfo.suffix()))
-        current_manager = video_manager;
-    else {
-        clearItem();
-        return;
+    current_manager = NULL;
+    for(MediaManager* manager : managers) {
+        if(manager->filetypes().contains(fileInfo.suffix())) {
+            current_manager = manager;
+            current_manager->load(file);
+            return;
+        }
     }
-    current_manager->load(file);
+    // No manager was found for this filetype
+    showError(tr("Filetype not supported"), fileInfo.suffix());
+    clearItem();
 }
 
 void MainWindow::volumeChange(int change)
@@ -408,18 +454,28 @@ void MainWindow::dropEvent(QDropEvent *de)
         QFileInfo pathInfo = QFileInfo(path);
         qDebug() << "dropped: " << path;
         if(pathInfo.isFile()) {
-            if(image_manager->hasExtension(pathInfo.suffix()))
-                image_manager->checkExtension(pathInfo.suffix());
-            else if(video_manager->hasExtension(pathInfo.suffix()))
-                video_manager->checkExtension(pathInfo.suffix());
-            else {
-                qDebug() << "ERROR Invalid filetype: " << pathInfo.suffix();
+            bool valid = false;
+            for(QAction* action : filetypes_menu->actions()) {
+                if(action->text()==pathInfo.suffix()) {
+                    action->setChecked(true);
+                    valid = true;
+                    break;
+                }
+            }
+            if(!valid) {
+                showError(tr("Invalid filetype"), pathInfo.suffix());
                 return;
             }
-        }
-        if(pathInfo.isDir())
+            loadFolder(pathInfo.dir().absolutePath(), pathInfo.fileName());
+        } else if(pathInfo.isDir())
             loadFolder(path);
         else
-            loadFolder(pathInfo.dir().absolutePath(), pathInfo.fileName());
+            showError(tr("Not a file or folder"), path);
     }
+}
+
+
+void MainWindow::showError(QString str, QString cause) {
+    //TODO: Eventually make this graphical
+    qDebug() << str << tr(": ") << cause;
 }
