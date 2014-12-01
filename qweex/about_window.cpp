@@ -2,8 +2,9 @@
 
 Qweex::AboutWindow::AboutWindow(QWidget *parent) : QDialog(parent)
 {
-    QString iconpath = ":/logo/images/logo_192.png";
+    //connect(about_window, SIGNAL(finished(int)), about_window, SLOT(close()));
 
+    QString iconpath = ":/logo/images/logo_192.png";
     QString license_href = QString("<a href='").append(LICENSE_URL).append("'>").append(LICENSE_NAME).append("</a>");
 
     // We need to set the window icon explicitly here since for some reason the
@@ -130,8 +131,7 @@ void Qweex::AboutWindow::showLicense()
     QVBoxLayout *layout = new QVBoxLayout();
     layout->setSizeConstraint(QLayout::SetFixedSize);
 
-    //Title
-
+    // Title
     QLabel* title = new QLabel(QString(LICENSE_NAME)
                            #ifdef LICENSE_VERSION
                                .append(" ").append(LICENSE_VERSION)
@@ -141,38 +141,46 @@ void Qweex::AboutWindow::showLicense()
     font.setPointSize(20);
     font.setBold(true);
     title->setFont(font);
-
-    QFile data(QString("./").append(LICENSE_FILENAME));
-
-
-    QTextEdit* text = new QTextEdit();
-    if(data.exists()) {
-        data.open(QIODevice::ReadOnly);
-        text->setText(data.readAll());
-        QFontMetrics qfm(text->font());
-        text->setMinimumSize(
-                    qfm.width("     b. You must ensure that all recipients of the machine-executable forms")+50,
-                    qfm.height()*30);
-    } else {
-        text->setText(tr("License file can not be found."));
-    }
-
-    text->setReadOnly(true);
-    QLabel* link = new QLabel();
-    link->setText(tr("The license can be found online at: ")
-                .append("<p>").append("<a href='").append(LICENSE_URL).append("'>").append(LICENSE_URL).append("</a>")
-                );
-
-    //Buttons
-    QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Close);
-    QPushButton *closeButton = buttonBox->button(QDialogButtonBox::Close);
-    buttonBox->addButton(closeButton, QDialogButtonBox::ButtonRole(QDialogButtonBox::RejectRole | QDialogButtonBox::AcceptRole));
-    connect(buttonBox , SIGNAL(rejected()), license, SLOT(reject()));
-
     layout->addWidget(title);
+
+
+    // License Content
+    QTextEdit* text = new QTextEdit();
+    text->setReadOnly(true);
+    QFile license_file(QString(":/").append(LICENSE_FILENAME));
+    if(license_file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QString file_contents = license_file.readAll();
+        text->setText(file_contents);
+        QFontMetrics qfm(text->font());
+
+        QString longest_line;
+        QStringList lines = file_contents.split("\n");
+        for(QString line : lines)
+            if(line.length() > longest_line.length())
+                longest_line = line;
+
+        if(longest_line.length() > 80) {
+            longest_line = longest_line.left(80);
+        }
+
+        qDebug() << longest_line;
+        text->setMinimumSize(
+                    qfm.width(longest_line)+20,
+                    qfm.height()*qMax(20, qMin(lines.length()+1, 30)));
+    } else {
+        text->setText(tr("Cannot read license file."));
+    }
     layout->addWidget(text);
+
+    // Web Link
+    #ifdef LICENSE_URL
+    QLabel* link = new QLabel();
+    link->setText(tr("The license can also be found online at: ")
+                .append("<br/><a href='").append(LICENSE_URL).append("'>").append(LICENSE_URL).append("</a>")
+                );
+    link->setOpenExternalLinks(true);
     layout->addWidget(link);
-    layout->addWidget(buttonBox, 0, Qt::AlignRight);
+    #endif
 
     license->setLayout(layout);
     license->show();
