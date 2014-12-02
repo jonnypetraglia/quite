@@ -102,15 +102,15 @@ private:
     MediaManager* current_manager = NULL;
 
     // Widgets
-    QVector<QWidget*> status_bar_widgets;
     QCheckBox* random_order;
+    QVector<QWidget*> tb_widgets;
     QSpinBox* slideshow_time;
     QDial* volume_dial;
     QPushButton* filetypes;
     QMenu* filetypes_menu;
 
-    QLabel* status_bar_speed;
-    QLabel* status_bar_text;
+    QLabel* tb_speed;
+    QLabel* tb_text;
     QPushButton* slideshow_button;
 
     // Various Variables

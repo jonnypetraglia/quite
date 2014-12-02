@@ -49,7 +49,7 @@ MainWindow::MainWindow(QWidget *parent) :
     for(int i=0; i<metaEnum.keyCount(); i++)
         sort_select->addItem(tr(metaEnum.key(i)));
     connect(sort_select, SIGNAL(currentIndexChanged(int)), this, SLOT(changeSort(int)));
-    status_bar_widgets.append(sort_select);
+    tb_widgets.append(sort_select);
 
     // Filetypes
         // Get ALL the filetypes!
@@ -69,21 +69,21 @@ MainWindow::MainWindow(QWidget *parent) :
         // Build the button
     filetypes = new QPushButton(tr("%n filetype(s)", "", all_filetypes.length()));
     filetypes->setMenu(filetypes_menu);
-    status_bar_widgets.append(filetypes);
+    tb_widgets.append(filetypes);
 
     //
-    status_bar_widgets.append(SEPARATOR_SENTINEL);
+    tb_widgets.append(SEPARATOR_SENTINEL);
     //
 
     // Speed label
-    status_bar_speed = new QLabel();
-    status_bar_widgets.append(status_bar_speed);
+    tb_speed = new QLabel();
+    tb_widgets.append(tb_speed);
 
     // Slideshow button
     slideshow_button = new QPushButton(tr("Slide"));
     slideshow_button->setFocusPolicy(Qt::NoFocus);
     connect(slideshow_button, SIGNAL(clicked()), this, SLOT(slideshowButton()));
-    status_bar_widgets.append(slideshow_button);
+    tb_widgets.append(slideshow_button);
 
     // Slideshow time
     slideshow_time = new QSpinBox();
@@ -92,7 +92,7 @@ MainWindow::MainWindow(QWidget *parent) :
     slideshow_time->setRange(1, 60);
     slideshow_time->setFocusPolicy(Qt::NoFocus);
     connect(slideshow_time, SIGNAL(valueChanged(int)), this, SLOT(restartSlideshow(int)));
-    status_bar_widgets.append(slideshow_time);
+    tb_widgets.append(slideshow_time);
 
     // Volume
     volume_dial = new QDial();
@@ -105,15 +105,15 @@ MainWindow::MainWindow(QWidget *parent) :
     volume_dial->setMaximumSize(QSize(30,30));
     volume_dial->setWrapping(false); //WTF does this do?
     connect(volume_dial, SIGNAL(valueChanged(int)), this, SLOT(volumeChange(int)));
-    status_bar_widgets.append(volume_dial);
+    tb_widgets.append(volume_dial);
 
     // Text
-    status_bar_text = new QLabel();
-    status_bar_text->setAlignment(Qt::AlignRight);
-    status_bar_widgets.append(status_bar_text);
+    tb_text = new QLabel();
+    tb_text->setAlignment(Qt::AlignRight);
+    tb_widgets.append(tb_text);
 
     // Disable all the widgets until a folder is loaded
-    for(QWidget* widget : status_bar_widgets) {
+    for(QWidget* widget : tb_widgets) {
         widget->setDisabled(true);
         if(widget==SEPARATOR_SENTINEL)
             tool_bar->addSeparator();
@@ -236,7 +236,7 @@ void MainWindow::loadFolder(QString folder, QString file)
     else
         list_index = list.indexOf(file,0);
 
-    for(QWidget* widget : status_bar_widgets)
+    for(QWidget* widget : tb_widgets)
         widget->setDisabled(false);
 
     loadItem();
@@ -364,7 +364,7 @@ void MainWindow::setSpeed(double d)
 {
     qDebug() << "setSpeed " << d;
     current_manager->setSpeed(d);
-    status_bar_speed->setText(QString("%1x").arg(d/100.0));
+    tb_speed->setText(QString("%1x").arg(d/100.0));
 }
 
 void MainWindow::startSlideshow()
@@ -397,8 +397,8 @@ void MainWindow::clearItem()
         current_manager->clear();
     list_index = 0;
     this->setWindowTitle("<None>");
-    status_bar_text->setText("<Folder empty>");
-    status_bar_speed->setText("");
+    tb_text->setText("<Folder empty>");
+    tb_speed->setText("");
 }
 
 // Load the file that is marked as the current file
@@ -408,7 +408,7 @@ void MainWindow::loadItem()
     QString file = folder + "/" + list.at(list_index);
     QFileInfo fileInfo = QFileInfo(file);
     this->setWindowTitle(fileInfo.fileName());
-    status_bar_text->setText(fileInfo.fileName());
+    tb_text->setText(fileInfo.fileName());
 
     qDebug() << "Loading File " << file;
 
