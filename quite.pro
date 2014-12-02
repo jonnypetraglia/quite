@@ -26,7 +26,8 @@ HEADERS  += project.h\
 
 QT += multimedia multimediawidgets
 
-OTHER_FILES += LICENSE\
+OTHER_FILES += README.md\
+                LICENSE\
                 ICONS.txt\
                 platform/*\
                 images/*
