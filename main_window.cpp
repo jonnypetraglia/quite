@@ -3,8 +3,7 @@
 
 MainWindow::MainWindow(QWidget *parent) :
     Qweex::MainWindow(parent),
-    sort_order(Name),
-    sort_reverse(No)
+    sort_order(QDir::Name)
 {
     qDebug() << "Main Window Started";
 
@@ -17,10 +16,16 @@ MainWindow::MainWindow(QWidget *parent) :
     setSizePolicy(pol);
     setWindowTitle(APP_NAME);
     setGeometry(QRect(0, 0, WIDTH, HEIGHT));
+    setAcceptDrops(true);
 
     /////////// Misc variables ///////////
     slide_timer = new QTimer;
     connect(slide_timer, SIGNAL(timeout()), this, SLOT(nextItemWhenConvenient()));
+    sorts.append(qMakePair(tr("Name"),   QDir::Name));
+    sorts.append(qMakePair(tr("Date"),   QDir::Time));
+    sorts.append(qMakePair(tr("Size"),   QDir::Size));
+    sorts.append(qMakePair(tr("Type"),   QDir::Type));
+    sorts.append(qMakePair(tr("Random"), QDir::Unsorted));
 
     /////////// Setup the Menu ///////////
     QMenu* browse_menu = new QMenu(tr("&Browse"));
@@ -44,12 +49,23 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Sort Order
     QComboBox* sort_select = new QComboBox;
-    const QMetaObject &mo = MainWindow::staticMetaObject;
-    QMetaEnum metaEnum = mo.enumerator(mo.indexOfEnumerator("SORT"));
-    for(int i=0; i<metaEnum.keyCount(); i++)
-        sort_select->addItem(tr(metaEnum.key(i)));
+    for(int i=0; i<sorts.length(); i++) {
+        sort_select->addItem(sorts.at(i).first);
+        if(sorts.at(i).second==sort_order)
+            sort_select->setCurrentIndex(i);
+    }
     connect(sort_select, SIGNAL(currentIndexChanged(int)), this, SLOT(changeSort(int)));
     tb_widgets.append(sort_select);
+
+    // Reverse
+    reverse_button = new QPushButton;
+    reverse_button->setCheckable(true);
+    reverse_button->setChecked(false); //:OPTIONS?
+    reverse_button->setText("Я");
+    reverse_button->setToolTip(tr("Reverse Sort"));
+    connect(reverse_button, SIGNAL(clicked()), this, SLOT(reloadFolder()));
+    tb_widgets.append(reverse_button);
+
 
     // Filetypes
         // Get ALL the filetypes!
@@ -204,7 +220,12 @@ void MainWindow::loadFolder(QString folder, QString file)
     QDir folderQDir(folder);
     folderQDir.setNameFilters(filetypes_want);
     folderQDir.setFilter(QDir::Files | QDir::CaseSensitive | QDir::NoDotAndDotDot);
-    folderQDir.setSorting(QFlags<QDir::SortFlag>(sort_order) | QFlags<QDir::SortFlag>(sort_reverse));
+
+
+    if(sort_order!=QDir::Unsorted && sort_order!=QDir::Name && reverse_button->isChecked())
+        folderQDir.setSorting(sort_order | QDir::Reversed);
+    else
+        folderQDir.setSorting(sort_order);
     list = folderQDir.entryList();
 
     // If there are no files
@@ -215,19 +236,14 @@ void MainWindow::loadFolder(QString folder, QString file)
 
     // Post-Sort (if necessary)
     switch(sort_order) {
-        case Name:
-            QUnicodeCollationAlgorithm::collatorKeySort(list);
+        case QDir::Name:
+            QUnicodeCollationAlgorithm::collatorKeySort(list, reverse_button->isChecked());
             break;
-        case Random:
+        case QDir::Unsorted: //Random
             std::random_shuffle(list.begin(), list.end());
             break;
-    }
-
-
-    // Determine if this was a reload, in which case we should not reload the current item
-    if(sameFile) {
-        qDebug() << "Reloading same file, so not re-starting it";
-        return;
+        default:
+            break;
     }
 
     // Set the current file's index in the list
@@ -235,6 +251,14 @@ void MainWindow::loadFolder(QString folder, QString file)
         list_index = 0;
     else
         list_index = list.indexOf(file,0);
+
+    // Determine if this was a reload, in which case we should not reload the current item
+    // Note: we still have to call 'indexOf' up there cause even if it is the same file, the order of the files
+    //       may have changed, causing list_index to be incorrect.
+    if(sameFile) {
+        qDebug() << "Reloading same file, so not re-starting it";
+        return;
+    }
 
     for(QWidget* widget : tb_widgets)
         widget->setDisabled(false);

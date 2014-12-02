@@ -14,6 +14,7 @@
 #include <QTimer>
 #include <QMenuBar>
 #include <QWidgetList>
+#include <QPair>
 
 #include <QDir>
 #include <QMimeData>
@@ -22,7 +23,6 @@
 #include <QToolBar>
 #include <QVector>
 #include <QComboBox>
-#include <QMetaEnum>
 
 class MainWindow : public Qweex::MainWindow
 {
@@ -61,32 +61,12 @@ public slots:
         else
             goto_next_slide = true;
     }
-    void changeSort(int enumInd) {
-        const QMetaObject &mo = MainWindow::staticMetaObject;
-        QMetaEnum metaEnum = mo.enumerator(mo.indexOfEnumerator("SORT"));
-        sort_order = (SORT)metaEnum.value(enumInd);
+    void changeSort(int index) {
+        qDebug() << "changeSort: " << sorts.at(index).first;
+        sort_order = sorts.at(index).second;
+        reverse_button->setEnabled(sort_order!=QDir::Unsorted);
         reloadFolder();
     }
-    void changeRandom(bool checked) {
-        sort_reverse = checked ? Yes : No;
-        reloadFolder();
-    }
-
-public:
-    // Enums
-    enum SORT {
-        Name = QDir::Name,
-        Random = QDir::NoSort
-        //TODO: MOAR
-        // e.g.
-        //
-    };
-    enum REVERSE {
-        Yes = QDir::Reversed,
-        No = 0 //Note: This will be OR'ed with SORT, hence the 0
-    };
-    Q_ENUMS(SORT)
-    Q_ENUMS(REVERSE)
 
 private:
     // GUI stuffs
@@ -102,8 +82,8 @@ private:
     MediaManager* current_manager = NULL;
 
     // Widgets
-    QCheckBox* random_order;
     QVector<QWidget*> tb_widgets;
+    QPushButton* reverse_button;
     QSpinBox* slideshow_time;
     QDial* volume_dial;
     QPushButton* filetypes;
@@ -116,8 +96,9 @@ private:
     // Various Variables
     QTimer* slide_timer;
     bool goto_next_slide;
-    SORT sort_order;
-    REVERSE sort_reverse;
+    QVector< QPair<QString, QDir::SortFlag> > sorts;
+    QDir::SortFlag sort_order;
+
 
     // Non-Slot Functions
     void loadItem();
