@@ -21,7 +21,8 @@ HEADERS  += project.h\
             main_window.h\
             media_manager.h\
             image_manager.h\
-            video_manager.h
+            video_manager.h \
+            platform/mac.h
 
 
 QT += multimedia multimediawidgets
@@ -41,6 +42,9 @@ macx {
     #QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.6
     #QMAKE_MAC_SDK = macosx
     #QMAKE_INFO_PLIST = platform/Info.plist
+
+    OBJECTIVE_SOURCES += platform/mac.mm
+    LIBS += -framework Cocoa
 }
 win32 {
     ICON = images/logo.ico

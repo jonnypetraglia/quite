@@ -188,7 +188,6 @@ void MainWindow::reloadFolder()
 // Read a folder's files
 void MainWindow::loadFolder(QString folder, QString file)
 {
-    qDebug() << "Loading Folder " << folder;
     QStringList filetypes_want;
     bool filetypes_want_includes_file = false;
     for(QAction* action : filetypes_menu->actions())
@@ -199,6 +198,8 @@ void MainWindow::loadFolder(QString folder, QString file)
                 filetypes_want_includes_file = true;
         }
     }
+
+    qDebug() << "Loading Folder " << folder << " with " << filetypes_want.join(", ");
 
     // If there are no checked filetypes
     if(filetypes_want.size()==0) {
@@ -469,31 +470,47 @@ void MainWindow::resizeEvent(QResizeEvent * qre)
     qre->accept();
 }
 
+#ifdef __APPLE__
+#include "platform/mac.h"
+#endif
+
 void MainWindow::dropEvent(QDropEvent *de)
 {
     qDebug() << "dropping";
     if(de->mimeData()->hasUrls())
     {
-        QString path = de->mimeData()->urls().first().toString().remove(0, QString("file:///").length());
-        QFileInfo pathInfo = QFileInfo(path);
-        qDebug() << "dropped: " << path;
-        if(pathInfo.isFile()) {
+        QString path = de->mimeData()->urls().first().toString();
+
+        #ifdef __APPLE__
+            // Mac gives this retarded format back:
+            //      file:///file/id=6571367.8312154
+            // So we have to call some native Obj-C code to convert to a usable string.
+            const char* derp = Platform::fileIdToPath(path.toStdString().c_str());
+            printf("dropped: %s\n", derp);
+            path = QString::fromUtf8(derp);
+        #endif
+        path.remove(0, QString("file://").length());
+
+        QFileInfo file_info(path);
+        if(file_info.isFile()) {
             bool valid = false;
             for(QAction* action : filetypes_menu->actions()) {
-                if(action->text()==pathInfo.suffix()) {
+                if(action->text()==file_info.suffix()) {
                     action->setChecked(true);
                     valid = true;
                     break;
                 }
             }
             if(!valid) {
-                showError(tr("Invalid filetype"), pathInfo.suffix());
+                showError(tr("Invalid filetype"), file_info.suffix());
                 return;
             }
-            loadFolder(pathInfo.dir().absolutePath(), pathInfo.fileName());
-        } else if(pathInfo.isDir())
+            loadFolder(file_info.dir().absolutePath(), file_info.fileName());
+            de->accept();
+        } else if(file_info.isDir()) {
             loadFolder(path);
-        else
+            de->accept();
+        } else
             showError(tr("Not a file or folder"), path);
     }
 }
@@ -501,5 +518,5 @@ void MainWindow::dropEvent(QDropEvent *de)
 
 void MainWindow::showError(QString str, QString cause) {
     //TODO: Eventually make this graphical
-    qDebug() << str << tr(": ") << cause;
+    qDebug() << QString(str.append(": ").append(cause));
 }
