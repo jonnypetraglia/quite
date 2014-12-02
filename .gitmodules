@@ -1,0 +1,3 @@
+[submodule "qwmainwindow"]
+	path = qwmainwindow
+	url = git@gitlab.com:notbryant/qwmainwindow.git

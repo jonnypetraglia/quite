@@ -17,7 +17,6 @@ MainWindow::MainWindow(QWidget *parent) :
     setSizePolicy(pol);
     setWindowTitle(APP_NAME);
     setGeometry(QRect(0, 0, WIDTH, HEIGHT));
-    setUnifiedTitleAndToolBarOnMac(true); //TODO: Should I?
 
     /////////// Misc variables ///////////
     slide_timer = new QTimer;
@@ -132,6 +131,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
     Qweex::MainWindow::doPlatformSpecific();
+    Qweex::MainWindow::addMenus();
     qDebug() << "mainWindow created";
 }
 

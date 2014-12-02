@@ -3,7 +3,6 @@
 
 #define APP_NAME "Quite"
 #define APP_VERSION "0.1.0"
-#define BUILD_DATE "November 29, 2014",
 
 #define LICENSE_NAME "BSD 3-Clause License"
 #define LICENSE_FILENAME "LICENSE"

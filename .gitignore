@@ -1,4 +1,2 @@
-quite.pro.user.*
-qweex/purchase/*.cpp
-qweex/purchase/*.h
+*.pro.user*
 *.ignore

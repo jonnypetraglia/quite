@@ -14,18 +14,14 @@ SOURCES  += main.cpp\
             main_window.cpp \
             image_manager.cpp\
             video_manager.cpp\
-            quca.hpp\
-            qweex/qweex_main_window.cpp\
-            qweex/about_window.cpp
+            quca.hpp
 
 
 HEADERS  += project.h\
             main_window.h\
             media_manager.h\
             image_manager.h\
-            video_manager.h\
-            qweex/qweex_main_window.h\
-            qweex/about_window.h
+            video_manager.h
 
 
 QT += multimedia multimediawidgets
@@ -33,8 +29,7 @@ QT += multimedia multimediawidgets
 OTHER_FILES += LICENSE\
                 ICONS.txt\
                 platform/*\
-                images/*\
-                qweex/purchase/.keep
+                images/*
 
 macx {
     ICON = images/logo.icns
@@ -54,13 +49,6 @@ win32 {
 linux-g++ {
 }
 
-# Proprietary stuff that I'm going to hell for
-exists(qweex/purchase/purchase.h)
-{
-    DEFINES += "SUPPORT_THE_DEV"
-    HEADERS += qweex/purchase/purchase.h qweex/purchase/qprogressindicator.h
-    SOURCES += qweex/purchase/purchase.cpp qweex/purchase/qprogressindicator.cpp
-    QT += network
-}
+RESOURCES += project.qrc
 
-RESOURCES += qweex/qweex.qrc project.qrc
+include(qwmainwindow/qwmainwindow.pri)
