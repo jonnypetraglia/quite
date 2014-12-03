@@ -16,7 +16,7 @@ class MainWindow;
 class MediaManager : public QObject {
     Q_OBJECT
 public:
-    MediaManager(QStringList filetypes, bool v) : FILETYPES(filetypes), has_volume(v) {}
+    MediaManager(QStringList filetypes) : FILETYPES(filetypes) {}
     virtual QWidget* widget() = 0;
     virtual void load(QString) = 0;
     virtual void unload() = 0;
@@ -24,6 +24,8 @@ public:
     virtual void slower() = 0;
     virtual void setSpeed(double) = 0;
     virtual double getSpeed() = 0;
+    virtual void forward() = 0;
+    virtual void back() = 0;
     virtual bool togglePause() = 0;
     virtual void setVolume(double) = 0;
     virtual double getVolume() = 0;
@@ -31,12 +33,12 @@ public:
     const QStringList filetypes() {
         return FILETYPES;
     }
-    bool hasVolume() { return has_volume; }
+    virtual bool hasVolume() = 0;
+    virtual bool hasSeek() = 0;
 
 protected:
     const QStringList FILETYPES;
     MainWindow *main_window = NULL;
-    const bool has_volume;
 };
 
 #endif // MEDIA_MANAGER_H

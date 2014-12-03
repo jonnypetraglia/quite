@@ -390,6 +390,22 @@ void MainWindow::keyPressEvent(QKeyEvent * e)
                 change *= -1;
             volumeChange(current_manager->getVolume() + change);
             return;
+        case Qt::Key_Greater:
+        case Qt::Key_Period:
+            if(current_manager->hasSeek()) {
+                current_manager->forward();
+                if(!shift)
+                    current_manager->forward();
+            }
+            return;
+        case Qt::Key_Less:
+        case Qt::Key_Comma:
+            if(current_manager->hasSeek()) {
+                current_manager->back();
+                if(!shift)
+                    current_manager->back();
+            }
+            return;
         default:
             return;
     }

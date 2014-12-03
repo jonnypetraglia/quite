@@ -2,7 +2,7 @@
 #include "main_window.h"
 
 VideoManager::VideoManager(MainWindow* window)
-    : MediaManager(QStringList() << "mov" << "mp4", true) //, << "webm")
+    : MediaManager(QStringList() << "mov" << "mp4") //, << "webm")
 {
     main_window = window;
     video_player = new QMediaPlayer;
@@ -70,6 +70,16 @@ void VideoManager::slower()
         return;
     qDebug() << speed;
     main_window->setSpeed(speed);
+}
+
+void VideoManager::back()
+{
+    video_player->setPosition(qMax(video_player->position() - 5000, (long long)0));
+}
+
+void VideoManager::forward()
+{
+    video_player->setPosition(qMin(video_player->position() + 5000, video_player->duration()));
 }
 
 bool VideoManager::togglePause()

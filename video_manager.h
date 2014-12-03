@@ -21,6 +21,8 @@ public:
     bool togglePause();
     void faster();
     void slower();
+    void forward();
+    void back();
 
     double getSpeed() {
         return video_player->playbackRate() * 100;
@@ -35,6 +37,9 @@ public:
     void setVolume(double change) {
         video_player->setVolume(change);
     }
+
+    bool hasVolume() { return true; }
+    bool hasSeek() { return true; }
 
 private:
     QMediaPlayer* video_player;

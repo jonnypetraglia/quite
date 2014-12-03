@@ -21,6 +21,15 @@ public:
     bool togglePause();
     void faster();
     void slower();
+    void forward() {
+        qCritical() << "ImageManager does not have seek.";
+        throw "ImageManager does not have seek.";
+    }
+
+    void back() {
+        qCritical() << "ImageManager does not have seek.";
+        throw "ImageManager does not have seek.";
+    }
 
     double getSpeed() {
         return image_widget->movie()->speed();
@@ -35,6 +44,9 @@ public:
         throw "ImageManager does not have volume.";
         return 0;
     }
+
+    bool hasVolume() { return false; }
+    bool hasSeek() { return false; }
 
 public slots:
     void movieFinished(int);
