@@ -80,6 +80,7 @@ MainWindow::MainWindow(QWidget *parent) :
         QAction *ftype = new QAction(s, filetypes_menu);
         ftype->setCheckable(true);
         ftype->setChecked(true); //:OPTION
+        connect(ftype, SIGNAL(changed()), this, SLOT(reloadFolder()));
         filetypes_menu->addAction(ftype);
     }
         // Build the button
@@ -215,6 +216,9 @@ void MainWindow::loadFolder(QString folder, QString file)
     // If there are no checked filetypes
     if(filetypes_want.size()==0) {
         clearItem(); return; }
+
+    filetypes->setText(tr("%n filetype(s)", "", filetypes_want.length()));
+
 
     // Check to see if the file we want is the same as is already loaded to avoid reloading it.
     bool sameFile = true; //Guilty until proven innocent
