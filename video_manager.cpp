@@ -20,8 +20,6 @@ VideoManager::~VideoManager()
 
 void VideoManager::load(QString file)
 {
-    main_window->setCentralWidget(video_widget);
-
     qDebug() << "Playing " << QUrl::fromLocalFile(file);
 
     video_player->setMedia(QUrl::fromLocalFile(file));

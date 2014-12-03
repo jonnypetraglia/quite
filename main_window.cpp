@@ -91,10 +91,6 @@ MainWindow::MainWindow(QWidget *parent) :
     tb_widgets.append(SEPARATOR_SENTINEL);
     //
 
-    // Speed label
-    tb_speed = new QLabel();
-    tb_widgets.append(tb_speed);
-
     // Slideshow button
     slideshow_button = new QPushButton(tr("Slide"));
     slideshow_button->setFocusPolicy(Qt::NoFocus);
@@ -123,10 +119,17 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(volume_dial, SIGNAL(valueChanged(int)), this, SLOT(volumeChange(int)));
     tb_widgets.append(volume_dial);
 
+
+    /////////// Setup the StatusBar ///////////
+
+    // Speed label
+    sb_speed = new QLabel();
+    statusBar()->addWidget(sb_speed);
+
     // Text
-    tb_text = new QLabel();
-    tb_text->setAlignment(Qt::AlignRight);
-    tb_widgets.append(tb_text);
+    sb_text = new QLabel();
+    sb_text->setAlignment(Qt::AlignRight);
+    statusBar()->addWidget(sb_text, 1);
 
     // Disable all the widgets until a folder is loaded
     for(QWidget* widget : tb_widgets) {
@@ -397,7 +400,7 @@ void MainWindow::setSpeed(double d)
 {
     qDebug() << "setSpeed " << d;
     current_manager->setSpeed(d);
-    tb_speed->setText(QString("%1x").arg(d/100.0));
+    sb_speed->setText(QString("%1x").arg(d/100.0));
 }
 
 void MainWindow::startSlideshow()
@@ -453,7 +456,8 @@ void MainWindow::loadItem()
     QString file = folder + "/" + list.at(list_index);
     QFileInfo fileInfo = QFileInfo(file);
     this->setWindowTitle(fileInfo.fileName());
-    tb_text->setText(fileInfo.fileName());
+    sb_text->setText(fileInfo.fileName());
+    sb_speed->setText("");
 
     qDebug() << "Loading File " << file;
 

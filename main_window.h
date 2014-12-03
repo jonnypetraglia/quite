@@ -82,19 +82,20 @@ private:
     QVector<MediaManager*> managers;
     MediaManager* current_manager = NULL;
 
-    // Widgets
     QStackedWidget* widget_stack;
 
+    // Toolbar Widgets
     QVector<QWidget*> tb_widgets;
     QPushButton* reverse_button;
     QSpinBox* slideshow_time;
     QDial* volume_dial;
     QPushButton* filetypes;
     QMenu* filetypes_menu;
-
-    QLabel* tb_speed;
-    QLabel* tb_text;
     QPushButton* slideshow_button;
+
+    // Statusbar Widgets
+    QLabel* sb_speed;
+    QLabel* sb_text;
 
     // Various Variables
     QTimer* slide_timer;
