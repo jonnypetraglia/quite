@@ -442,6 +442,12 @@ void MainWindow::loadItem()
     for(MediaManager* manager : managers) {
         if(manager->filetypes().contains(fileInfo.suffix())) {
             current_manager = manager;
+            if(current_manager->hasVolume()) {
+                qDebug() << "Manager has volume";
+                volume_dial->setEnabled(true);
+                volume_dial->setValue(current_manager->getVolume());
+            } else
+                volume_dial->setEnabled(false);
             current_manager->load(file);
             return;
         }
@@ -451,14 +457,15 @@ void MainWindow::loadItem()
     clearItem();
 }
 
-void MainWindow::volumeChange(int change)
+void MainWindow::volumeChange(int newVol)
 {
-    //TODO: volume_dial->pageStep() ???
-    qDebug() << "Volume = " << change;
-    //if(volume_dial->value()!=change)
-        //volume_dial->setValue(change); //TODO: This is supposed to sync up key shortcuts & the dial
+    if(current_manager==NULL || !current_manager->hasVolume() || newVol<0 || newVol>100)
+        return;
 
-    current_manager->setVolume(change);
+    if(volume_dial->value()!=newVol)
+        volume_dial->setValue(newVol);
+
+    current_manager->setVolume(newVol);
 }
 
 void MainWindow::resizeEvent(QResizeEvent * qre)

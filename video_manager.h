@@ -27,10 +27,12 @@ public:
     void clear() {
         //TODO
     }
-    void setVolume(double change)
-    {
+    double getVolume() {
+        return video_player->volume();
+    }
+
+    void setVolume(double change) {
         video_player->setVolume(change);
-        video_player->setMuted(false); //TODO: Remove this once there is a way to toggle mute
     }
 
 private:

@@ -24,17 +24,15 @@ public:
     double getSpeed() {
         return image_widget->movie()->speed();
     }
-    void clear() {
-        if(image_widget->movie()==NULL)
-        {
-            image_widget->setMovie(new QMovie);
-            image_widget->movie()->setScaledSize(QSize(100,100));
-        }
-        image_widget->movie()->stop();
-        image_widget->setText("No item");
-    }
     void setVolume(double d) {
         do{d=0;}while(0); //Noop
+        qCritical() << "ImageManager does not have volume.";
+        throw "ImageManager does not have volume.";
+    }
+    double getVolume() {
+        qCritical() << "ImageManager does not have volume.";
+        throw "ImageManager does not have volume.";
+        return 0;
     }
 
 public slots:
