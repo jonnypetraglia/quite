@@ -337,6 +337,9 @@ void MainWindow::keyPressEvent(QKeyEvent * e)
     if(folder=="")
         return;
     e->accept();
+    bool shift = e->modifiers().testFlag(Qt::ShiftModifier);
+    int change;
+
     switch (e->key()) {
         case Qt::Key_Right:
             nextItem();
@@ -345,10 +348,16 @@ void MainWindow::keyPressEvent(QKeyEvent * e)
             prevItem();
             break;
         case Qt::Key_Plus:
+        case Qt::Key_Equal:
             current_manager->faster();
+            if(!shift)
+                current_manager->faster();
             break;
         case Qt::Key_Minus:
+        case Qt::Key_Underscore:
             current_manager->slower();
+            if(!shift)
+                current_manager->slower();
             break;
         case Qt::Key_0:
             setSpeed();
@@ -373,6 +382,13 @@ void MainWindow::keyPressEvent(QKeyEvent * e)
                 showNormal();
             else
                 showFullScreen();
+            return;
+        case Qt::Key_Up:
+        case Qt::Key_Down:
+            change = shift ? 1 : 5;
+            if(e->key()==Qt::Key_Down)
+                change *= -1;
+            volumeChange(current_manager->getVolume() + change);
             return;
         default:
             return;
