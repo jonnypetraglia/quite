@@ -2,7 +2,7 @@
 #include "main_window.h"
 
 VideoManager::VideoManager(MainWindow* window)
-    : MediaManager(QStringList() << "mov" << "mp4") //, << "webm")
+    : MediaManager(QStringList() << "mov" << "mp4", true) //, << "webm")
 {
     main_window = window;
     video_player = new QMediaPlayer;
@@ -23,10 +23,10 @@ void VideoManager::load(QString file)
     qDebug() << "Playing " << QUrl::fromLocalFile(file);
 
     video_player->setMedia(QUrl::fromLocalFile(file));
-    //videoWidget->show();
-    video_player->setMuted(true);
+    video_player->setPosition(0);
+    video_player->setMuted(true); //:OPTIONS
+    //setSpeed(100);
     video_player->play();
-    setSpeed(0);
 }
 
 void VideoManager::unload()
@@ -44,34 +44,31 @@ void VideoManager::setSpeed(double speedFrom0To100)
 void VideoManager::faster()
 {
     double speed = getSpeed();
-    if(speed > 100)
-    {
-        if(speed >= 250)
-            return;
-        else
-            speed += 10;
-    } else {
-        if(speed >= 60)
-            speed += 5;
-        else
-            speed += 2;
-    }
+    if(speed >= 60)
+        speed += 5;
+    else if(speed >= 20)
+        speed += 2;
+    else
+        speed += 1;
+
+    if(speed >= 250)
+        return;
     main_window->setSpeed(speed);
 }
 
 void VideoManager::slower()
 {
     double speed = getSpeed();
-    if(speed > 100)
-        speed -= 10;
-    else {
-        if(speed > 60)
-            speed -= 5;
-        else if(speed > 5)
-            speed -= 2;
-        else
-            return;
-    }
+    if(speed >= 60)
+        speed -= 5;
+    else if(speed >= 20)
+        speed -= 2;
+    else if(speed > 0)
+        speed -= 1;
+
+    if(speed<0)
+        return;
+    qDebug() << speed;
     main_window->setSpeed(speed);
 }
 

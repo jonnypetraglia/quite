@@ -2,7 +2,7 @@
 #include "main_window.h"
 
 ImageManager::ImageManager(MainWindow* window)
-    : MediaManager(QStringList() << "jpg" << "png" << "gif")
+    : MediaManager(QStringList() << "jpg" << "png" << "gif", false)
 {
     main_window = window;
     image_widget = new QLabel;

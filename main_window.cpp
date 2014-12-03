@@ -538,8 +538,7 @@ void MainWindow::dropEvent(QDropEvent *de)
             //      file:///file/id=6571367.8312154
             // So we have to call some native Obj-C code to convert to a usable string.
             const char* derp = Platform::fileIdToPath(path.toStdString().c_str());
-            printf("dropped: %s\n", derp);
-            path = QString::fromUtf8(derp);
+            path = QUrl(QString::fromUtf8(derp)).toString();
         #endif
         path.remove(0, QString("file://").length());
 
