@@ -427,16 +427,28 @@ void MainWindow::clearItem()
 {
     qDebug() << "clearing item";
     if(current_manager!=NULL)
-        current_manager->clear();
+        current_manager->unload();
     list_index = 0;
-    this->setWindowTitle("<None>");
-    tb_text->setText("<Folder empty>");
-    tb_speed->setText("");
+    this->setWindowTitle(QString("<").append(tr("None")).append(">"));
+    sb_text->setText(QString("<").append(tr("Folder empty")).append(">"));
+    sb_speed->setText("");
+}
+
+void MainWindow::unloadItem()
+{
+    if(current_manager==NULL || list_index>=list.length())
+        return;
+
+    qDebug() << "Unloading File " << list.at(list_index);
+
+    current_manager->unload();
 }
 
 // Load the file that is marked as the current file
 void MainWindow::loadItem()
 {
+    unloadItem();
+
     qDebug() << "Loading Item at " << list_index;
     QString file = folder + "/" + list.at(list_index);
     QFileInfo fileInfo = QFileInfo(file);
