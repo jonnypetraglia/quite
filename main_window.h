@@ -102,6 +102,7 @@ private:
 
     // Non-Slot Functions
     void loadItem();
+    void unloadItem();
     void clearItem();
     void startSlideshow();
     void stopSlideshow();

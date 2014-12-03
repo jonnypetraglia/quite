@@ -18,6 +18,7 @@ class MediaManager : public QObject {
 public:
     MediaManager(QStringList filetypes) : FILETYPES(filetypes) {}
     virtual void load(QString) = 0;
+    virtual void unload() = 0;
     virtual void faster() = 0;
     virtual void slower() = 0;
     virtual void setSpeed(double) = 0;

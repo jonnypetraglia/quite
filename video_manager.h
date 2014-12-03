@@ -14,6 +14,7 @@ public:
     VideoManager(MainWindow*);
     ~VideoManager();
     void load(QString);
+    void unload();
     void setSpeed(double);
     void resize(QResizeEvent*);
     bool togglePause();

@@ -20,10 +20,14 @@ ImageManager::ImageManager(MainWindow* window)
     QMainWindow::connect(image_widget->movie(), SIGNAL(frameChanged(int)), (ImageManager*)this, SLOT(movieFinished(int)));
 }
 
+void ImageManager::unload()
+{
+    image_widget->movie()->stop();
+}
+
 void ImageManager::load(QString file)
 {
     main_window->setCentralWidget(image_widget);
-    image_widget->movie()->stop();
 
     qDebug() << "Showing File " << file;
 

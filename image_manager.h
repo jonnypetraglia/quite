@@ -14,6 +14,7 @@ class ImageManager : public MediaManager
 public:
     ImageManager(MainWindow*);
     void load(QString);
+    void unload();
     void setSpeed(double);
     void resize(QResizeEvent*);
     bool togglePause();

@@ -31,6 +31,12 @@ void VideoManager::load(QString file)
     setSpeed(0);
 }
 
+void VideoManager::unload()
+{
+    video_player->stop();
+    video_player->setMedia(NULL);
+}
+
 void VideoManager::setSpeed(double speedFrom0To100)
 {
     video_player->setPlaybackRate(speedFrom0To100 / 100);
