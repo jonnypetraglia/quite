@@ -15,6 +15,7 @@
 #include <QMenuBar>
 #include <QWidgetList>
 #include <QPair>
+#include <QStackedWidget>
 
 #include <QDir>
 #include <QMimeData>
@@ -82,6 +83,8 @@ private:
     MediaManager* current_manager = NULL;
 
     // Widgets
+    QStackedWidget* widget_stack;
+
     QVector<QWidget*> tb_widgets;
     QPushButton* reverse_button;
     QSpinBox* slideshow_time;

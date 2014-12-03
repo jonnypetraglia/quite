@@ -13,6 +13,7 @@ class VideoManager : public MediaManager
 public:
     VideoManager(MainWindow*);
     ~VideoManager();
+    QWidget* widget() { return video_widget; }
     void load(QString);
     void unload();
     void setSpeed(double);

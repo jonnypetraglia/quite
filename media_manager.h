@@ -16,7 +16,8 @@ class MainWindow;
 class MediaManager : public QObject {
     Q_OBJECT
 public:
-    MediaManager(QStringList filetypes) : FILETYPES(filetypes) {}
+    MediaManager(QStringList filetypes, bool v) : FILETYPES(filetypes), has_volume(v) {}
+    virtual QWidget* widget() = 0;
     virtual void load(QString) = 0;
     virtual void unload() = 0;
     virtual void faster() = 0;

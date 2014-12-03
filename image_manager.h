@@ -13,6 +13,7 @@ class ImageManager : public MediaManager
     Q_OBJECT
 public:
     ImageManager(MainWindow*);
+    QWidget* widget() { return image_widget; }
     void load(QString);
     void unload();
     void setSpeed(double);

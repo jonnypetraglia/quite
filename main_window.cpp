@@ -143,7 +143,15 @@ MainWindow::MainWindow(QWidget *parent) :
     dapper_image->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
     dapper_image->setPixmap(QPixmap(":logo/images/logo_white.png"));
     dapper_image->setAlignment(Qt::AlignCenter);
-    setCentralWidget(dapper_image);
+
+    // QStackedLayout
+    widget_stack = new QStackedWidget;
+    widget_stack->addWidget(dapper_image);
+    for(MediaManager* manager : managers) {
+        widget_stack->addWidget(manager->widget());
+    }
+    widget_stack->setCurrentWidget(dapper_image);
+    setCentralWidget(widget_stack);
 
 
     Qweex::MainWindow::doPlatformSpecific();
@@ -442,6 +450,7 @@ void MainWindow::loadItem()
     for(MediaManager* manager : managers) {
         if(manager->filetypes().contains(fileInfo.suffix())) {
             current_manager = manager;
+            widget_stack->setCurrentWidget(current_manager->widget());
             if(current_manager->hasVolume()) {
                 qDebug() << "Manager has volume";
                 volume_dial->setEnabled(true);
