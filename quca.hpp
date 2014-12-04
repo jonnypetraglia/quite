@@ -21,22 +21,22 @@ namespace QUnicodeCollationAlgorithm {
      * It is deprecated (or at least, planned to be) by the 2 Collator classes.
      * Use: "When you need a simple natural string compare method"
      */
-    template<template<class> class QContainer>
-    void kHandlerSort(QContainer<QString> &thing, bool reverse=false);
+    template<typename QStringContainer>
+    void kHandlerSort(QStringContainer &list, bool reverse=false);
 
     /* This uses the new QCollator, which is a class designed specifically to compare strings according to locale
      * Use: "I cannot make up any reason anymore to use"
      */
     // NOTE: CANNOT get this to work. QCollator always returns 0 when comparing.
-    template<template<class> class QContainer>
-    void collatorSort(QContainer<QString> &thing, bool reverse=false);
+    template<typename QStringContainer>
+    void collatorSort(QStringContainer &thing, bool reverse=false);
 
     /* This is like the above, except it creates a QCollatorKey, which essentially is a way to cache the data needed to compare.
      * In sorting, you end out comparing the same object multiple times, so you can see how this would be beneficial.
      * Use: "If you have more time"
      */
-    template<template<class> class QContainer>
-    void collatorKeyCompare(QContainer<QString> &thing, bool reverse=false);
+    template<typename QStringContainer>
+    void collatorKeyCompare(QStringContainer &thing, bool reverse=false);
 
 
 
@@ -47,8 +47,8 @@ namespace QUnicodeCollationAlgorithm {
 
     /**************************************************************************/
 
-    template<template<class> class QContainer>
-    void kHandlerSort(QContainer<QString> &x, bool reverse)
+    template<typename QContainer>
+    void kHandlerSort(QContainer &x, bool reverse)
     {
         if(reverse)
             std::sort(x.begin(), x.end(), [&](const QString& a, const QString& b) { return naturalCompare(a, b, Qt::CaseInsensitive) > 0; });
@@ -56,8 +56,8 @@ namespace QUnicodeCollationAlgorithm {
             std::sort(x.begin(), x.end(), [&](const QString& a, const QString& b) { return naturalCompare(a, b, Qt::CaseInsensitive) < 0; });
     }
 
-    template<template<class> class QContainer>
-    void collatorSort(QContainer<QString> &x, bool reverse)
+    template<typename QContainer>
+    void collatorSort(QContainer &x, bool reverse)
     {
         QCollator col;
         col.setNumericMode(true);
@@ -69,8 +69,8 @@ namespace QUnicodeCollationAlgorithm {
             std::sort(x.begin(), x.end(), [&](const QString& a, const QString& b) { return col.compare(a, b) < 0; });
     }
 
-    template<template<class> class QContainer>
-    void collatorKeySort(QContainer<QString> &thing, bool reverse)
+    template<typename QContainer>
+    void collatorKeySort(QContainer &thing, bool reverse)
     {
         QCollator col;
         col.setNumericMode(true);
