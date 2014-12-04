@@ -235,7 +235,7 @@ void MainWindow::loadFolder(QString folder, QString file)
     this->folder = folder;
     QDir folderQDir(folder);
     folderQDir.setNameFilters(filetypes_want);
-    folderQDir.setFilter(QDir::Files | QDir::CaseSensitive | QDir::NoDotAndDotDot);
+    folderQDir.setFilter(QDir::Files | QDir::NoDotAndDotDot);
 
 
     if(sort_order!=QDir::Unsorted && sort_order!=QDir::Name && reverse_button->isChecked())
@@ -263,10 +263,10 @@ void MainWindow::loadFolder(QString folder, QString file)
     }
 
     // Set the current file's index in the list
-    if(file=="" || list.indexOf(file,0)<0)
+    if(file=="" || (list_index = list.indexOf(file,0)) < 0) {
         list_index = 0;
-    else
-        list_index = list.indexOf(file,0);
+        showError("File was not found in folder list", file);
+    }
 
     // Determine if this was a reload, in which case we should not reload the current item
     // Note: we still have to call 'indexOf' up there cause even if it is the same file, the order of the files
