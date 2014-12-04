@@ -14,7 +14,6 @@ MainWindow::MainWindow(QWidget *parent) :
     pol.setHorizontalStretch(0);
     pol.setVerticalStretch(0);
     setSizePolicy(pol);
-    setWindowTitle(APP_NAME);
     setGeometry(QRect(0, 0, WIDTH, HEIGHT));
     setAcceptDrops(true);
 
@@ -27,14 +26,6 @@ MainWindow::MainWindow(QWidget *parent) :
     sorts.append(qMakePair(tr("Type"),   QDir::Type));
     sorts.append(qMakePair(tr("Random"), QDir::Unsorted));
 
-    /////////// Setup the Menu ///////////
-    QMenu* browse_menu = new QMenu(tr("&Browse"));
-    QAction *file = browse_menu->addAction(tr("F&ile")),
-             *folder = browse_menu->addAction(tr("F&older"));
-    connect(file, SIGNAL(triggered()), this, SLOT(browseForFile()));
-    connect(folder, SIGNAL(triggered()), this, SLOT(browseForFolder()));
-    menuBar()->addMenu(browse_menu);
-
     /////////// Create the managers ///////////
     managers.append(new ImageManager(this));
     managers.append(new VideoManager(this));
@@ -43,9 +34,11 @@ MainWindow::MainWindow(QWidget *parent) :
     QWidget* SEPARATOR_SENTINEL = new QWidget;
 
     // Init the toolbar
-    QToolBar* tool_bar = new QToolBar(this);
+    QToolBar* tool_bar = new QToolBar(tr("&Toolbar"), this);
     this->addToolBar(Qt::BottomToolBarArea, tool_bar); //:OPTIONS
     tool_bar->setFloatable(false); //:OPTIONS
+    tool_bar->setMovable(false); //:OPTIONS
+    tool_bar->setVisible(true); //:OPTIONS
 
     // Sort Order
     QComboBox* sort_select = new QComboBox;
@@ -131,6 +124,27 @@ MainWindow::MainWindow(QWidget *parent) :
     sb_text = new QLabel();
     sb_text->setAlignment(Qt::AlignRight);
     statusBar()->addWidget(sb_text, 1);
+    statusBar()->setVisible(true); //:OPTIONS
+
+
+    /////////// Setup the Menu ///////////
+    QMenu* browse_menu = new QMenu(tr("&Browse"));
+    QAction *file = browse_menu->addAction(tr("F&ile")),
+             *folder = browse_menu->addAction(tr("F&older"));
+    connect(file, SIGNAL(triggered()), this, SLOT(browseForFile()));
+    connect(folder, SIGNAL(triggered()), this, SLOT(browseForFolder()));
+    menuBar()->addMenu(browse_menu);
+
+    QMenu* view_menu = new QMenu(tr("&View"));
+    view_menu->addActions(QList<QAction*>() << tool_bar->toggleViewAction());
+    toggle_status = view_menu->addAction(tr("&Status Bar"));
+    connect(toggle_status, SIGNAL(triggered()), this, SLOT(toggleStatusBar()));
+    toggle_status->setCheckable(true);
+    toggle_status->setChecked(!statusBar()->isHidden());
+    menuBar()->addMenu(view_menu);
+
+
+    /////////// Final Setup ///////////
 
     // Disable all the widgets until a folder is loaded
     for(QWidget* widget : tb_widgets) {

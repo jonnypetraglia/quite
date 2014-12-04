@@ -41,6 +41,9 @@ public:
     void dragEnterEvent(QDragEnterEvent *event) { event->acceptProposedAction();}
     void dropEvent(QDropEvent*);
 
+    // Don't want a context menu on the toolbar
+    QMenu* createPopupMenu() { return NULL; }
+
 
     void loadFolder(QString folder, QString file = "");
     void setSpeed(double d=100);
@@ -68,6 +71,14 @@ public slots:
         reverse_button->setEnabled(sort_order!=QDir::Unsorted);
         reloadFolder();
     }
+    void toggleStatusBar() {
+        qDebug() << statusBar()->isVisible();
+        if(statusBar()->isVisible())
+            statusBar()->hide();
+        else
+            statusBar()->show();
+        toggle_status->setChecked(statusBar()->isVisible());
+    }
 
 private:
     // GUI stuffs
@@ -78,10 +89,14 @@ private:
     int list_index;
     QString folder;
 
+    // Menu items
+    QAction* toggle_status;
+
     // Managers
     QVector<MediaManager*> managers;
     MediaManager* current_manager = NULL;
 
+    // Misc widgets
     QStackedWidget* widget_stack;
 
     // Toolbar Widgets

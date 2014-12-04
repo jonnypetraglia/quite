@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
     a.setApplicationDisplayName(APP_NAME);
     a.setOrganizationName(COPYRIGHT_HOLDER);
     a.setOrganizationDomain(COPYRIGHT_DOMAIN);
-
+    a.setApplicationVersion(APP_VERSION);
     a.setWindowIcon(QIcon(":/logo/images/logo_512.png"));
 
     MainWindow w;
