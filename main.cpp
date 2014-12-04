@@ -8,6 +8,7 @@
 #include <QDir>
 #include <QVideoWidget>
 #include <QMediaPlayer>
+#include <QDesktopWidget>
 
 int main(int argc, char *argv[])
 {
@@ -44,6 +45,7 @@ int main(int argc, char *argv[])
         else
             w.loadFolder(fileinfo.absoluteDir().absolutePath(), fileinfo.fileName());
     }
+    w.move(QApplication::desktop()->screenGeometry().center() - w.rect().center());
     w.show();
     return a.exec();
 }
