@@ -206,7 +206,7 @@ void MainWindow::loadFolder(QString folder, QString file)
     {
         if(action->isChecked()) {
             filetypes_want.append(QString("*.").append(action->text()));
-            if(action->text()==QFileInfo(file).suffix())
+            if(action->text().compare(QFileInfo(file).suffix(), Qt::CaseInsensitive)==0)
                 filetypes_want_includes_file = true;
         }
     }
@@ -500,7 +500,7 @@ void MainWindow::loadItem()
     goto_next_slide = false;
     current_manager = NULL;
     for(MediaManager* manager : managers) {
-        if(manager->filetypes().contains(fileInfo.suffix())) {
+        if(manager->filetypes().contains(fileInfo.suffix(), Qt::CaseInsensitive)) {
             current_manager = manager;
             widget_stack->setCurrentWidget(current_manager->widget());
             if(current_manager->hasVolume()) {
@@ -566,17 +566,11 @@ void MainWindow::dropEvent(QDropEvent *de)
 
         QFileInfo file_info(path);
         if(file_info.isFile()) {
-            bool valid = false;
             for(QAction* action : filetypes_menu->actions()) {
-                if(action->text()==file_info.suffix()) {
+                if(action->text().compare(file_info.suffix(), Qt::CaseInsensitive)==0) {
                     action->setChecked(true);
-                    valid = true;
                     break;
                 }
-            }
-            if(!valid) {
-                showError(tr("Invalid filetype"), file_info.suffix());
-                return;
             }
             loadFolder(file_info.dir().absolutePath(), file_info.fileName());
             de->accept();
