@@ -538,7 +538,7 @@ void MainWindow::resizeEvent(QResizeEvent * qre)
     qre->accept();
 }
 
-#ifdef __APPLE__
+#ifdef Q_OS_OSX_
 #include "platform/mac.h"
 #endif
 
@@ -547,16 +547,22 @@ void MainWindow::dropEvent(QDropEvent *de)
     qDebug() << "dropping";
     if(de->mimeData()->hasUrls())
     {
-        QString path = de->mimeData()->urls().first().toString();
+        QUrl fileUrl(de->mimeData()->urls().first());
+        if(fileUrl.scheme()=="file")
+            fileUrl.setScheme("");
+        QString path = fileUrl.toString();
 
-        #ifdef __APPLE__
+        #ifdef Q_OS_OSX_
             // Mac gives this retarded format back:
             //      file:///file/id=6571367.8312154
             // So we have to call some native Obj-C code to convert to a usable string.
             const char* derp = Platform::fileIdToPath(path.toStdString().c_str());
             path = QUrl(QString::fromUtf8(derp)).toString();
         #endif
-        path.remove(0, QString("file://").length());
+        #ifdef Q_OS_WIN
+            // For some brilliant reason, Qt also starts paths on Windows with a leading '/'
+            path.remove(0, 1);
+        #endif
 
         QFileInfo file_info(path);
         if(file_info.isFile()) {

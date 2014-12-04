@@ -27,8 +27,6 @@ void ImageManager::unload()
 
 void ImageManager::load(QString file)
 {
-    main_window->setCentralWidget(image_widget);
-
     qDebug() << "Showing File " << file;
 
     image_widget->movie()->setFileName(file);
