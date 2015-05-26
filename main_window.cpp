@@ -69,13 +69,15 @@ MainWindow::MainWindow(QWidget *parent) :
     all_filetypes.sort(Qt::CaseInsensitive);
         // Build the menu
     filetypes_menu = new QMenu;
+    connect(filetypes_menu, SIGNAL(aboutToHide()), this, SLOT(reloadFolder()));
     for(QString s : all_filetypes) {
-        QAction *ftype = new QAction(s, filetypes_menu);
-        ftype->setCheckable(true);
-        ftype->setChecked(true); //:OPTION
-        connect(ftype, SIGNAL(changed()), this, SLOT(reloadFolder()));
-        filetypes_menu->addAction(ftype);
+        QCheckBox *checkBox = new QCheckBox(s, filetypes_menu);
+        checkBox->setChecked(true);
+        QWidgetAction *checkableAction = new QWidgetAction(filetypes_menu);
+        checkableAction->setDefaultWidget(checkBox);
+        filetypes_menu->addAction(checkableAction);
     }
+
         // Build the button
     filetypes = new QPushButton(tr("%n filetype(s)", "", all_filetypes.length()));
     filetypes->setMenu(filetypes_menu);
@@ -216,11 +218,13 @@ void MainWindow::loadFolder(QString folder, QString file)
 {
     QStringList filetypes_want;
     bool filetypes_want_includes_file = false;
+
     for(QAction* action : filetypes_menu->actions())
     {
-        if(action->isChecked()) {
-            filetypes_want.append(QString("*.").append(action->text()));
-            if(action->text().compare(QFileInfo(file).suffix(), Qt::CaseInsensitive)==0)
+        QCheckBox* checkbox = (QCheckBox*) ((QWidgetAction*)action)->defaultWidget();
+        if(checkbox->isChecked()) {
+            filetypes_want.append(QString("*.").append(checkbox->text()));
+            if(checkbox->text().compare(QFileInfo(file).suffix(), Qt::CaseInsensitive)==0)
                 filetypes_want_includes_file = true;
         }
     }
@@ -228,8 +232,8 @@ void MainWindow::loadFolder(QString folder, QString file)
     qDebug() << "Loading Folder " << folder << " with " << filetypes_want.join(", ");
 
     // If there are no checked filetypes
-    if(filetypes_want.size()==0) {
-        clearItem(); return; }
+    //if(filetypes_want.size()==0) {
+    //    clearItem(); return; }
 
     filetypes->setText(tr("%n filetype(s)", "", filetypes_want.length()));
 
@@ -552,7 +556,7 @@ void MainWindow::resizeEvent(QResizeEvent * qre)
     qre->accept();
 }
 
-#ifdef Q_OS_OSX_
+#ifdef Q_OS_MAC
 #include "platform/mac.h"
 #endif
 
@@ -562,27 +566,38 @@ void MainWindow::dropEvent(QDropEvent *de)
     if(de->mimeData()->hasUrls())
     {
         QUrl fileUrl(de->mimeData()->urls().first());
-        if(fileUrl.scheme()=="file")
-            fileUrl.setScheme("");
-        QString path = fileUrl.toString();
 
-        #ifdef Q_OS_OSX_
+        qDebug() << fileUrl;
+
+        #ifdef Q_OS_MAC
             // Mac gives this retarded format back:
             //      file:///file/id=6571367.8312154
             // So we have to call some native Obj-C code to convert to a usable string.
-            const char* derp = Platform::fileIdToPath(path.toStdString().c_str());
-            path = QUrl(QString::fromUtf8(derp)).toString();
+        if(fileUrl.toString().startsWith("file:///file/")) {
+            const char* derp = Platform::fileIdToPath(fileUrl.toString().toStdString().c_str());
+            qDebug() << derp;
+            fileUrl = QUrl(QString::fromUtf8(derp));
+        } else if(fileUrl.toString().startsWith("file:///"))
+            fileUrl = QUrl(fileUrl.toString().mid(QString("file://").length()));
         #endif
+
+
+        if(fileUrl.scheme()=="file")
+            fileUrl.setScheme("");
+        QString path = fileUrl.toString();
         #ifdef Q_OS_WIN
             // For some brilliant reason, Qt also starts paths on Windows with a leading '/'
             path.remove(0, 1);
         #endif
 
+        qDebug() << fileUrl << path;
+;
         QFileInfo file_info(path);
         if(file_info.isFile()) {
             for(QAction* action : filetypes_menu->actions()) {
-                if(action->text().compare(file_info.suffix(), Qt::CaseInsensitive)==0) {
-                    action->setChecked(true);
+                QCheckBox* checkbox = (QCheckBox*) ((QWidgetAction*)action)->defaultWidget();
+                if(checkbox->text().compare(file_info.suffix(), Qt::CaseInsensitive)==0) {
+                    checkbox->setChecked(true);
                     break;
                 }
             }

@@ -2,42 +2,43 @@
 #include "main_window.h"
 
 VideoManager::VideoManager(MainWindow* window)
-    : MediaManager(QStringList() << "mov" << "mp4") //, << "webm")
+    : MediaManager(QStringList() << "flv" << "mov" << "mp4" << "webm")
 {
     main_window = window;
-    video_player = new QMediaPlayer;
-    video_widget = new QVideoWidget;
-    video_player->setVideoOutput(video_widget);
-    video_widget->setStyleSheet("QWidget { background-color: black; }");
+
+    video_player = new QtAV::AVPlayer(main_window);
+    video_output = new QtAV::VideoOutput(main_window);
+    if(!video_output->widget()) {
+        QMessageBox::warning(0, "QtAV error", "Can not create video renderer");
+        return;
+    }
+    video_player->setRepeat(-1);
+    video_player->setRenderer(video_output);
 }
 
 VideoManager::~VideoManager()
 {
-    //delete video_player;
-    //delete video_widget;
+    delete video_player;
+    delete video_output;
 }
 
 
 void VideoManager::load(QString file)
 {
     qDebug() << "Playing " << QUrl::fromLocalFile(file);
-
-    video_player->setMedia(QUrl::fromLocalFile(file));
-    video_player->setPosition(0);
-    video_player->setMuted(true); //:OPTIONS
-    //setSpeed(100);
-    video_player->play();
+    video_player->play(file);
+    //video_player->load(file, true);
 }
 
 void VideoManager::unload()
 {
     video_player->stop();
-    video_player->setMedia(NULL);
+    video_player->unload();
 }
 
 void VideoManager::setSpeed(double speedFrom0To100)
 {
-    video_player->setPlaybackRate(speedFrom0To100 / 100);
+    video_player->setSpeed(speedFrom0To100 / 100);
     qDebug() << "speed " << speedFrom0To100;
 }
 
@@ -74,21 +75,20 @@ void VideoManager::slower()
 
 void VideoManager::back()
 {
-    video_player->setPosition(qMax(video_player->position() - 5000, (long long)0));
+    video_player->seekBackward();
+    //video_player->setPosition(qMax(video_player->position() - 5000, (long long)0));
 }
 
 void VideoManager::forward()
 {
-    video_player->setPosition(qMin(video_player->position() + 5000, video_player->duration()));
+    video_player->seekForward();
+    //video_player->setPosition(qMin(video_player->position() + 5000, video_player->duration()));
 }
 
 bool VideoManager::togglePause()
 {
-    if(video_player->state()==QMediaPlayer::PausedState)
-        video_player->play();
-    else
-        video_player->pause();
-    return video_player->state()==QMediaPlayer::PausedState;
+    video_player->togglePause();
+    return video_player->isPaused();
 }
 
 void VideoManager::resize(QResizeEvent *qre)

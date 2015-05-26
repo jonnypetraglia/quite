@@ -1,9 +1,9 @@
 TARGET = Quite
 VERSION = 0.1.0
 
-CONFIG += c++11
+CONFIG += c++11 av avwidgets
 
-QT += core gui
+QT += core gui av opengl avwidgets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 

@@ -25,6 +25,8 @@
 #include <QVector>
 #include <QComboBox>
 
+#include <QWidgetAction>
+
 class MainWindow : public Qweex::MainWindow
 {
     Q_OBJECT
