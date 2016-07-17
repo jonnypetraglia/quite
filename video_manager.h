@@ -16,7 +16,7 @@ public:
     VideoManager(MainWindow*);
     ~VideoManager();
     QWidget* widget() { return video_output->widget(); }
-    void load(QString);
+    void load(QString, QObject* slotmate, char* slot);
     void unload();
     void setSpeed(double);
     void resize(QResizeEvent*);
@@ -43,6 +43,10 @@ public:
 
     bool hasVolume() { return true; }
     bool hasSeek() { return true; }
+
+    qint64 length() {
+        return video_player->duration();
+    }
 
 private:
     QtAV::VideoOutput *video_output;

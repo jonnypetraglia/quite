@@ -18,7 +18,7 @@ class MediaManager : public QObject {
 public:
     MediaManager(QStringList filetypes) : FILETYPES(filetypes) {}
     virtual QWidget* widget() = 0;
-    virtual void load(QString) = 0;
+    virtual void load(QString, QObject*, char*) = 0;
     virtual void unload() = 0;
     virtual void faster() = 0;
     virtual void slower() = 0;
@@ -35,6 +35,8 @@ public:
     }
     virtual bool hasVolume() = 0;
     virtual bool hasSeek() = 0;
+
+    virtual qint64 length() = 0;
 
 protected:
     const QStringList FILETYPES;

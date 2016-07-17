@@ -2,7 +2,7 @@
 #include "main_window.h"
 
 ImageManager::ImageManager(MainWindow* window)
-    : MediaManager(QStringList() << "jpg" << "png" << "gif")
+    : MediaManager(QStringList() << "jpeg" << "jpg" << "png" << "gif")
 {
     main_window = window;
     image_widget = new QLabel;
@@ -25,7 +25,7 @@ void ImageManager::unload()
     image_widget->movie()->stop();
 }
 
-void ImageManager::load(QString file)
+void ImageManager::load(QString file, QObject* slotmate, char* slot)
 {
     qDebug() << "Showing File " << file;
 
@@ -91,8 +91,9 @@ bool ImageManager::togglePause()
 void ImageManager::resize(QResizeEvent *qre)
 {
     QSize newsize = img_size;
-    //newsize.scale(qre->size().width(), qre->size().height(), Qt::KeepAspectRatio);
-    newsize.scale(main_window->size().width()-100, main_window->size().height()-100, Qt::KeepAspectRatio);
+    newsize.scale(qre->size().width(), qre->size().height(), Qt::KeepAspectRatio);
+    //newsize.scale(main_window->size().width()-100, main_window->size().height()-100, Qt::KeepAspectRatio);
+    image_widget->movie()->stop();
     image_widget->movie()->setScaledSize(newsize);
     image_widget->movie()->start();
 }

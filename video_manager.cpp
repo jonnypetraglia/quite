@@ -2,7 +2,7 @@
 #include "main_window.h"
 
 VideoManager::VideoManager(MainWindow* window)
-    : MediaManager(QStringList() << "flv" << "mov" << "mp4" << "webm")
+    : MediaManager(QStringList() << "flv" << "gifv" << "mov" << "mp4" << "webm")
 {
     main_window = window;
 
@@ -22,18 +22,18 @@ VideoManager::~VideoManager()
     delete video_output;
 }
 
-
-void VideoManager::load(QString file)
+void VideoManager::load(QString file, QObject* slotOwner, char* updateSlot)
 {
     qDebug() << "Playing " << QUrl::fromLocalFile(file);
+    //connect(video_player, SIGNAL(positionChanged(qint64)), slotOwner, updateSlot);
+    connect(video_player, SIGNAL(started()), slotOwner, updateSlot);
     video_player->play(file);
-    //video_player->load(file, true);
 }
 
 void VideoManager::unload()
 {
     video_player->stop();
-    video_player->unload();
+//    video_player->unload();
 }
 
 void VideoManager::setSpeed(double speedFrom0To100)
@@ -75,14 +75,14 @@ void VideoManager::slower()
 
 void VideoManager::back()
 {
-    video_player->seekBackward();
-    //video_player->setPosition(qMax(video_player->position() - 5000, (long long)0));
+    //video_player->seekBackward();
+    video_player->seek(qMax(video_player->position() - 5000, (long long)0));
 }
 
 void VideoManager::forward()
 {
-    video_player->seekForward();
-    //video_player->setPosition(qMin(video_player->position() + 5000, video_player->duration()));
+    //video_player->seekForward();
+    video_player->seek(qMin(video_player->position() + 5000, video_player->duration()));
 }
 
 bool VideoManager::togglePause()

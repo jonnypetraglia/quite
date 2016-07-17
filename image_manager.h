@@ -14,7 +14,7 @@ class ImageManager : public MediaManager
 public:
     ImageManager(MainWindow*);
     QWidget* widget() { return image_widget; }
-    void load(QString);
+    void load(QString, QObject*, char*);
     void unload();
     void setSpeed(double);
     void resize(QResizeEvent*);
@@ -47,6 +47,10 @@ public:
 
     bool hasVolume() { return false; }
     bool hasSeek() { return false; }
+
+    qint64 length() {
+        return 0;
+    }
 
 public slots:
     void movieFinished(int);

@@ -59,6 +59,14 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(reverse_button, SIGNAL(clicked()), this, SLOT(reloadFolder()));
     tb_widgets.append(reverse_button);
 
+    // Recurse
+    recurse_button = new QPushButton;
+    recurse_button->setCheckable(true);
+    recurse_button->setChecked(false); //:OPTIONS?
+    recurse_button->setText("R");
+    recurse_button->setToolTip(tr("Recurse into subdirectories"));
+    connect(recurse_button, SIGNAL(clicked()), this, SLOT(reloadFolder()));
+    tb_widgets.append(recurse_button);
 
     // Filetypes
         // Get ALL the filetypes!
@@ -117,6 +125,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
     /////////// Setup the StatusBar ///////////
+
+    // Video Length
+    sb_length = new QLabel();
+    statusBar()->addWidget(sb_length);
 
     // Speed label
     sb_speed = new QLabel();
@@ -214,7 +226,7 @@ void MainWindow::reloadFolder()
 }
 
 // Read a folder's files
-void MainWindow::loadFolder(QString folder, QString file)
+void MainWindow::loadFolder(QString folder, QFileInfo file)
 {
     QStringList filetypes_want;
     bool filetypes_want_includes_file = false;
@@ -224,7 +236,7 @@ void MainWindow::loadFolder(QString folder, QString file)
         QCheckBox* checkbox = (QCheckBox*) ((QWidgetAction*)action)->defaultWidget();
         if(checkbox->isChecked()) {
             filetypes_want.append(QString("*.").append(checkbox->text()));
-            if(checkbox->text().compare(QFileInfo(file).suffix(), Qt::CaseInsensitive)==0)
+            if(checkbox->text().compare(file.suffix(), Qt::CaseInsensitive)==0)
                 filetypes_want_includes_file = true;
         }
     }
@@ -251,16 +263,29 @@ void MainWindow::loadFolder(QString folder, QString file)
 
     // Set the folder & load the files
     this->folder = folder;
-    QDir folderQDir(folder);
-    folderQDir.setNameFilters(filetypes_want);
-    folderQDir.setFilter(QDir::Files | QDir::NoDotAndDotDot);
+    list.clear();
+    QDirIterator it(folder, filetypes_want, QDir::Files,
+                    recurse_button->isChecked() ? QDirIterator::Subdirectories : QDirIterator::NoIteratorFlags);
+    while(it.hasNext()) {
+        it.next();
+        list.append(it.fileInfo());
+    }
+
+    switch(sort_order) {
+        case QDir::Name:
+            qSort(list.begin(), list.end(), sortByName); break;
+            //TODO: QUnicodeCollationAlgorithm::collatorKeySort
+        case QDir::Time:
+            qSort(list.begin(), list.end(), sortByDate); break;
+        case QDir::Type:
+            qSort(list.begin(), list.end(), sortByType); break;
+        case QDir::Size:
+            qSort(list.begin(), list.end(), sortBySize); break;
+        case QDir::Unsorted:
+            std::random_shuffle(list.begin(), list.end()); break;
+    }
 
 
-    if(sort_order!=QDir::Unsorted && sort_order!=QDir::Name && reverse_button->isChecked())
-        folderQDir.setSorting(sort_order | QDir::Reversed);
-    else
-        folderQDir.setSorting(sort_order);
-    list = folderQDir.entryList();
 
     // If there are no files
     if(list.length()==0) {
@@ -269,6 +294,7 @@ void MainWindow::loadFolder(QString folder, QString file)
     qDebug() << "Files: " << list.size();
 
     // Post-Sort (if necessary)
+    /*
     switch(sort_order) {
         case QDir::Name:
             QUnicodeCollationAlgorithm::collatorKeySort(list, reverse_button->isChecked());
@@ -279,11 +305,12 @@ void MainWindow::loadFolder(QString folder, QString file)
         default:
             break;
     }
+    */
 
     // Set the current file's index in the list
-    if(file=="" || (list_index = list.indexOf(file,0)) < 0) {
+    if(file==QFileInfo() || (list_index = list.indexOf(file,0)) < 0) {
         list_index = 0;
-        showError("File was not found in folder list", file);
+        showError("File was not found in folder list", file.absoluteFilePath());
     }
 
     // Determine if this was a reload, in which case we should not reload the current item
@@ -300,6 +327,16 @@ void MainWindow::loadFolder(QString folder, QString file)
     loadItem();
 }
 
+bool sortByName(const QFileInfo &s1, const QFileInfo &s2) { return s1.fileName() < s2.fileName(); }
+bool sortByDate(const QFileInfo &s1, const QFileInfo &s2) { return s1.lastModified() > s2.lastModified(); }
+bool sortBySize(const QFileInfo &s1, const QFileInfo &s2) { return s1.size() < s2.size(); }
+bool sortByType(const QFileInfo &s1, const QFileInfo &s2) {
+    return s1.fileName().right(s1.fileName().length()-s1.baseName().length())
+            <
+           s2.fileName().right(s2.fileName().length()-s2.baseName().length())
+            ;
+}
+
 void MainWindow::browseForFile()
 {
     QString file = QFileDialog::getOpenFileName(this); //TODO filetype filtering
@@ -309,7 +346,7 @@ void MainWindow::browseForFile()
     if(fileinfo.isDir())
         loadFolder(fileinfo.filePath());
     else
-        loadFolder(fileinfo.absoluteDir().absolutePath(), fileinfo.fileName());
+        loadFolder(fileinfo.absoluteDir().absolutePath(), fileinfo.absoluteFilePath());
 }
 
 void MainWindow::browseForFolder()
@@ -406,7 +443,7 @@ void MainWindow::keyPressEvent(QKeyEvent * e)
             change = shift ? 1 : 5;
             if(e->key()==Qt::Key_Down)
                 change *= -1;
-            volumeChange(current_manager->getVolume() + change);
+            volumeChange(volume_dial->value() + change);
             return;
         case Qt::Key_Greater:
         case Qt::Key_Period:
@@ -496,7 +533,7 @@ void MainWindow::unloadItem()
     if(current_manager==NULL || list_index>=list.length())
         return;
 
-    qDebug() << "Unloading File " << list.at(list_index);
+    qDebug() << "Unloading File " << list.at(list_index).filePath();
 
     current_manager->unload();
 }
@@ -507,11 +544,12 @@ void MainWindow::loadItem()
     unloadItem();
 
     qDebug() << "Loading Item at " << list_index;
-    QString file = folder + "/" + list.at(list_index);
+    QString file = folder + "/" + list.at(list_index).fileName();
     QFileInfo fileInfo = QFileInfo(file);
     this->setWindowTitle(fileInfo.fileName());
-    sb_text->setText(fileInfo.fileName());
+    sb_text->setText(list.at(list_index).filePath());
     sb_speed->setText("");
+    sb_length->setText("");
 
     qDebug() << "Loading File " << file;
 
@@ -523,11 +561,12 @@ void MainWindow::loadItem()
             widget_stack->setCurrentWidget(current_manager->widget());
             if(current_manager->hasVolume()) {
                 qDebug() << "Manager has volume";
-                volume_dial->setEnabled(true);
-                volume_dial->setValue(current_manager->getVolume());
-            } else
-                volume_dial->setEnabled(false);
-            current_manager->load(file);
+//                volume_dial->setEnabled(true);
+//                volume_dial->setValue(current_manager->getVolume());
+            } //else
+                //volume_dial->setEnabled(false);
+
+            current_manager->load(file, this, SLOT(started()));
             return;
         }
     }
@@ -538,22 +577,23 @@ void MainWindow::loadItem()
 
 void MainWindow::volumeChange(int newVol)
 {
-    if(current_manager==NULL || !current_manager->hasVolume() || newVol<0 || newVol>100)
+    if(current_manager==NULL || newVol<0 || newVol>100)
         return;
 
     if(volume_dial->value()!=newVol)
         volume_dial->setValue(newVol);
 
-    current_manager->setVolume(newVol);
+    if(current_manager->hasVolume())
+        current_manager->setVolume(newVol);
 }
 
 void MainWindow::resizeEvent(QResizeEvent * qre)
 {
-    qDebug() << "resizing";
     if(current_manager!= NULL)
         current_manager->resize(qre);
 
     qre->accept();
+    qDebug() << "resizing";
 }
 
 #ifdef Q_OS_MAC
@@ -601,7 +641,7 @@ void MainWindow::dropEvent(QDropEvent *de)
                     break;
                 }
             }
-            loadFolder(file_info.dir().absolutePath(), file_info.fileName());
+            loadFolder(file_info.dir().absolutePath(), file_info.absoluteFilePath());
             de->accept();
         } else if(file_info.isDir()) {
             loadFolder(path);

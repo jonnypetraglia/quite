@@ -27,6 +27,9 @@
 
 #include <QWidgetAction>
 
+#include <QDirIterator>
+#include <QFileInfoList>
+
 class MainWindow : public Qweex::MainWindow
 {
     Q_OBJECT
@@ -47,7 +50,7 @@ public:
     QMenu* createPopupMenu() { return NULL; }
 
 
-    void loadFolder(QString folder, QString file = "");
+    void loadFolder(QString folder, QFileInfo file = QFileInfo());
     void setSpeed(double d=100);
 
     void showError(QString str, QString cause);
@@ -81,13 +84,26 @@ public slots:
             statusBar()->show();
         toggle_status->setChecked(statusBar()->isVisible());
     }
+    void started() {
+        volumeChange(volume_dial->value());
+    }
+
+    void position(qint64 position) {
+        QTime now = QTime::fromMSecsSinceStartOfDay(position),
+              end = QTime::fromMSecsSinceStartOfDay(current_manager->length());
+        QString tForm("m:ss");
+        if(end.hour()>0)
+            tForm.prepend("h:m");
+        sb_length->setText(now.toString(tForm) + "/" + end.toString(tForm));
+
+    }
 
 private:
     // GUI stuffs
     const int WIDTH = 731, HEIGHT = 518;
 
     // Current file & folder
-    QStringList list;
+    QFileInfoList list;
     int list_index;
     QString folder;
 
@@ -103,7 +119,7 @@ private:
 
     // Toolbar Widgets
     QVector<QWidget*> tb_widgets;
-    QPushButton* reverse_button;
+    QPushButton* reverse_button, *recurse_button;
     QSpinBox* slideshow_time;
     QDial* volume_dial;
     QPushButton* filetypes;
@@ -111,8 +127,7 @@ private:
     QPushButton* slideshow_button;
 
     // Statusbar Widgets
-    QLabel* sb_speed;
-    QLabel* sb_text;
+    QLabel* sb_length, *sb_speed, *sb_text;
 
     // Various Variables
     QTimer* slide_timer;
@@ -128,5 +143,10 @@ private:
     void startSlideshow();
     void stopSlideshow();
 };
+
+bool sortByName(const QFileInfo &s1, const QFileInfo &s2);
+bool sortByDate(const QFileInfo &s1, const QFileInfo &s2);
+bool sortBySize(const QFileInfo &s1, const QFileInfo &s2);
+bool sortByType(const QFileInfo &s1, const QFileInfo &s2);
 
 #endif // MAINWINDOW_H

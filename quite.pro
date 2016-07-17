@@ -1,7 +1,8 @@
 TARGET = Quite
 VERSION = 0.1.0
 
-CONFIG += c++11 av avwidgets
+CONFIG += c++11 avwidgets
+#av
 
 QT += core gui av opengl avwidgets
 
@@ -33,7 +34,7 @@ OTHER_FILES += README.md\
                 platform/*\
                 images/*
 
-macx {
+mac {
     ICON = images/logo.icns
     CONFIG += static
     LIBS += -dead_strip
@@ -45,6 +46,7 @@ macx {
 
     OBJECTIVE_SOURCES += platform/mac.mm
     LIBS += -framework Cocoa
+
 }
 win32 {
     ICON = images/logo.ico

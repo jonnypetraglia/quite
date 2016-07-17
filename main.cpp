@@ -14,7 +14,7 @@
 
 class QuiteApp : public QApplication {
 public:
-    QuiteApp(int argc, char *argv[]) : QApplication(argc, argv) {}
+    QuiteApp(int &argc, char ** argv) : QApplication(argc, argv) {}
     QString m_macFileOpenOnStart;
     MainWindow *w;
 
@@ -34,7 +34,7 @@ private:
                         if(w)
                         {
                             QFileInfo fi(m_macFileOpenOnStart);
-                            w->loadFolder(fi.dir().absolutePath(), fi.fileName());
+                            w->loadFolder(fi.dir().absolutePath(), fi.absoluteFilePath());
                         }
                         return true;
                     }
@@ -47,7 +47,7 @@ private:
 };
 
 
-int main(int argc, char *argv[])
+int main(int argc, char ** argv)
 {
     QtAV::Widgets::registerRenderers();
     QuiteApp a(argc, argv);
@@ -73,6 +73,10 @@ int main(int argc, char *argv[])
                   << " path_to_dir_or_file"
                   << endl;
     }
+
+    if(path=="")
+        path = QSettings().value("defaultPath", "").toString();
+
     if(path!="") {
         qDebug() << path;
 

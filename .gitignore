@@ -1,2 +1,5 @@
 *.pro.user*
 *.ignore
+Quite.app
+Makefile
+.qmake.stash
