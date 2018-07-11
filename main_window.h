@@ -30,7 +30,7 @@
 #include <QDirIterator>
 #include <QFileInfoList>
 
-class MainWindow : public Qweex::MainWindow
+class MainWindow
 {
     Q_OBJECT
     

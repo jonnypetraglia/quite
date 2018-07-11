@@ -47,6 +47,8 @@ mac {
     OBJECTIVE_SOURCES += platform/mac.mm
     LIBS += -framework Cocoa
 
+    QMAKE_RPATHDIR=$QTDIR/lib
+
 }
 win32 {
     ICON = images/logo.ico
