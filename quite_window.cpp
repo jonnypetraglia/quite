@@ -1,4 +1,4 @@
-#include "main_window.h"
+#include "quite_window.h"
 #include "quca.hpp"
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -186,8 +186,8 @@ MainWindow::MainWindow(QWidget *parent) :
     setCentralWidget(widget_stack);
 
 
-    Qweex::MainWindow::doPlatformSpecific();
-    Qweex::MainWindow::addMenus();
+//    Qweex::MainWindow::doPlatformSpecific();
+//    Qweex::MainWindow::addMenus();
     qDebug() << "mainWindow created";
 }
 
@@ -566,7 +566,8 @@ void MainWindow::loadItem()
             } //else
                 //volume_dial->setEnabled(false);
 
-            current_manager->load(file, this, SLOT(started()));
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//            current_manager->load(file, this, SLOT(started()));
             return;
         }
     }

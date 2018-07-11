@@ -29,7 +29,7 @@
 #include <QDirIterator>
 #include <QFileInfoList>
 
-class MainWindow
+class MainWindow : public QMainWindow
 {
     Q_OBJECT
     

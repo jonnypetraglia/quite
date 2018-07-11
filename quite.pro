@@ -12,14 +12,14 @@ TEMPLATE = app
 
 
 SOURCES  += main.cpp\
-            main_window.cpp \
+            quite_window.cpp \
             image_manager.cpp\
             video_manager.cpp\
             quca.hpp
 
 
 HEADERS  += project.h\
-            main_window.h\
+            quite_window.h\
             media_manager.h\
             image_manager.h\
             video_manager.h \

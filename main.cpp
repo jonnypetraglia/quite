@@ -1,5 +1,5 @@
 #include "project.h"
-#include "main_window.h"
+#include "quite_window.h"
 
 #include <QDebug>
 
@@ -11,6 +11,7 @@
 #include <QDesktopWidget>
 #include <QMessageBox>
 #include <QtAVWidgets>
+#include <QSettings>
 
 class QuiteApp : public QApplication {
 public:

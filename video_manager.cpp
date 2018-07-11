@@ -1,5 +1,5 @@
 #include "video_manager.h"
-#include "main_window.h"
+#include "quite_window.h"
 
 VideoManager::VideoManager(MainWindow* window)
     : MediaManager(QStringList() << "flv" << "gifv" << "mov" << "mp4" << "webm")

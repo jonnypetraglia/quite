@@ -1,5 +1,5 @@
 #include "image_manager.h"
-#include "main_window.h"
+#include "quite_window.h"
 
 ImageManager::ImageManager(MainWindow* window)
     : MediaManager(QStringList() << "jpeg" << "jpg" << "png" << "gif")

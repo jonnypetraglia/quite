@@ -2,6 +2,7 @@
 #define VIDEO_MANAGER_H
 
 #include <QDebug>
+#include <QMessageBox>
 
 #include "media_manager.h"
 #include <QMediaPlayer>
