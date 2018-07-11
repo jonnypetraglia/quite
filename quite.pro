@@ -59,5 +59,3 @@ linux-g++ {
 }
 
 RESOURCES += project.qrc
-
-include(qwmainwindow/qwmainwindow.pri)

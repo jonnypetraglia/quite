@@ -3,7 +3,6 @@
 
 #include "image_manager.h"
 #include "video_manager.h"
-#include "qwmainwindow/qweex_main_window.h"
 
 #include <QDebug>
 

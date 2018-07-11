@@ -2,7 +2,7 @@
 #include "quca.hpp"
 
 MainWindow::MainWindow(QWidget *parent) :
-    Qweex::MainWindow(parent),
+    QMainWindow(parent),
     sort_order(QDir::Name)
 {
     qDebug() << "Main Window Started";
