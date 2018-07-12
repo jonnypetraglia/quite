@@ -50,6 +50,7 @@ public:
 
 
     void loadFolder(QString folder, QFileInfo file = QFileInfo());
+    void loadFileList(QStringList fileList, QFileInfo qfi);
     void setSpeed(double d=100);
 
     void showError(QString str, QString cause);

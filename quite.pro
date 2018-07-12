@@ -5,6 +5,7 @@ CONFIG += c++11 avwidgets
 #av
 
 QT += core gui av opengl avwidgets
+QT += multimediawidgets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 

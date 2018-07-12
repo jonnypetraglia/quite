@@ -225,6 +225,15 @@ void QuiteWindow::reloadFolder()
         loadFolder(this->folder);
 }
 
+
+void QuiteWindow::loadFileList(QStringList files, QFileInfo file) {
+    list.clear();
+    for(QString str : files) {
+        list.append(QFileInfo(str));
+    }
+    loadItem();
+}
+
 // Read a folder's files
 void QuiteWindow::loadFolder(QString folder, QFileInfo file)
 {
@@ -544,12 +553,14 @@ void QuiteWindow::loadItem()
     unloadItem();
 
     qDebug() << "Loading Item at " << list_index;
-    QString file = folder + "/" + list.at(list_index).fileName();
+//    QString file = folder + "/" + list.at(list_index).fileName();
+    QString file = list.at(list_index).absoluteFilePath();
     QFileInfo fileInfo = QFileInfo(file);
     this->setWindowTitle(fileInfo.fileName());
     sb_text->setText(list.at(list_index).filePath());
     sb_speed->setText("");
     sb_length->setText("");
+
 
     qDebug() << "Loading File " << file;
 
@@ -566,8 +577,7 @@ void QuiteWindow::loadItem()
             } //else
                 //volume_dial->setEnabled(false);
 
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//            current_manager->load(file, this, SLOT(started()));
+            current_manager->load(file, this, SLOT(started()));
             return;
         }
     }
