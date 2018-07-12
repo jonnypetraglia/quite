@@ -1,6 +1,9 @@
 // Yanked from
 // https://gist.github.com/wedesoft/3216298
 
+#ifndef MAC_MM
+#define MAC_MM
+
 #import <Foundation/Foundation.h>
 #import <Foundation/NSUrl.h>
 #import <Foundation/NSString.h>
@@ -20,3 +23,5 @@ namespace Platform {
     }
 
 }
+
+#endif

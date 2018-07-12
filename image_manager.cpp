@@ -1,7 +1,7 @@
 #include "image_manager.h"
 #include "quite_window.h"
 
-ImageManager::ImageManager(MainWindow* window)
+ImageManager::ImageManager(QuiteWindow* window)
     : MediaManager(QStringList() << "jpeg" << "jpg" << "png" << "gif")
 {
     main_window = window;
@@ -25,7 +25,7 @@ void ImageManager::unload()
     image_widget->movie()->stop();
 }
 
-void ImageManager::load(QString file, QObject* slotmate, char* slot)
+void ImageManager::load(QString file, QObject* slotmate, const char* slot)
 {
     qDebug() << "Showing File " << file;
 

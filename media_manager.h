@@ -11,14 +11,14 @@
 #include <QVector>
 
 
-class MainWindow;
+class QuiteWindow;
 
 class MediaManager : public QObject {
     Q_OBJECT
 public:
     MediaManager(QStringList filetypes) : FILETYPES(filetypes) {}
     virtual QWidget* widget() = 0;
-    virtual void load(QString, QObject*, char*) = 0;
+    virtual void load(QString, QObject*, const char*) = 0;
     virtual void unload() = 0;
     virtual void faster() = 0;
     virtual void slower() = 0;
@@ -40,7 +40,7 @@ public:
 
 protected:
     const QStringList FILETYPES;
-    MainWindow *main_window = NULL;
+    QuiteWindow *main_window = NULL;
 };
 
 #endif // MEDIA_MANAGER_H

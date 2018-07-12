@@ -1,5 +1,5 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef QUITEWINDOW_H
+#define QUITEWINDOW_H
 
 #include "image_manager.h"
 #include "video_manager.h"
@@ -29,17 +29,17 @@
 #include <QDirIterator>
 #include <QFileInfoList>
 
-class MainWindow : public QMainWindow
+class QuiteWindow : public QMainWindow
 {
     Q_OBJECT
     
 public:
-    explicit MainWindow(QWidget *parent = 0);
+    explicit QuiteWindow(QWidget *parent = 0);
     void keyPressEvent(QKeyEvent *);
     void mousePressEvent(QMouseEvent *);
     void wheelEvent(QWheelEvent *);
     void resizeEvent(QResizeEvent * qre);
-    ~MainWindow();
+    ~QuiteWindow();
 
     void dragMoveEvent(QDragMoveEvent *de) { de->accept(); }
     void dragEnterEvent(QDragEnterEvent *event) { event->acceptProposedAction();}
@@ -148,4 +148,4 @@ bool sortByDate(const QFileInfo &s1, const QFileInfo &s2);
 bool sortBySize(const QFileInfo &s1, const QFileInfo &s2);
 bool sortByType(const QFileInfo &s1, const QFileInfo &s2);
 
-#endif // MAINWINDOW_H
+#endif // QuiteWindow_H

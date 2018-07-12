@@ -17,7 +17,7 @@ class QuiteApp : public QApplication {
 public:
     QuiteApp(int &argc, char ** argv) : QApplication(argc, argv) {}
     QString m_macFileOpenOnStart;
-    MainWindow *w;
+    QuiteWindow *w;
 
 private:
      bool event(QEvent *event)
@@ -60,7 +60,7 @@ int main(int argc, char ** argv)
     a.setApplicationVersion(APP_VERSION);
     a.setWindowIcon(QIcon(":/logo/images/logo_512.png"));
 
-    MainWindow w;
+    QuiteWindow w;
     a.w = &w;
 
     QString path;

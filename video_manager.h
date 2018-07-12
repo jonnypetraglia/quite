@@ -14,10 +14,10 @@ class VideoManager : public MediaManager
 {
     Q_OBJECT
 public:
-    VideoManager(MainWindow*);
+    VideoManager(QuiteWindow*);
     ~VideoManager();
     QWidget* widget() { return video_output->widget(); }
-    void load(QString, QObject* slotmate, char* slot);
+    void load(QString, QObject* slotmate, const char* slot);
     void unload();
     void setSpeed(double);
     void resize(QResizeEvent*);

@@ -1,7 +1,7 @@
 #include "quite_window.h"
 #include "quca.hpp"
 
-MainWindow::MainWindow(QWidget *parent) :
+QuiteWindow::QuiteWindow(QWidget *parent) :
     QMainWindow(parent),
     sort_order(QDir::Name)
 {
@@ -192,7 +192,7 @@ MainWindow::MainWindow(QWidget *parent) :
 }
 
 // Destructor
-MainWindow::~MainWindow()
+QuiteWindow::~QuiteWindow()
 {
     qDebug() << "Destroying mainWindow";
 
@@ -203,7 +203,7 @@ MainWindow::~MainWindow()
 
 
 // Start or stop the slideshow
-void MainWindow::slideshowButton()
+void QuiteWindow::slideshowButton()
 {
     qDebug() << "Slideshow Button";
     if(slide_timer->isActive()) {
@@ -216,7 +216,7 @@ void MainWindow::slideshowButton()
 }
 
 // Call 'loadFolder' again on the current folder (& current file)
-void MainWindow::reloadFolder()
+void QuiteWindow::reloadFolder()
 {
     qDebug() << "reloading folder";
     if(list_index>=0 && list_index<list.size())
@@ -226,7 +226,7 @@ void MainWindow::reloadFolder()
 }
 
 // Read a folder's files
-void MainWindow::loadFolder(QString folder, QFileInfo file)
+void QuiteWindow::loadFolder(QString folder, QFileInfo file)
 {
     QStringList filetypes_want;
     bool filetypes_want_includes_file = false;
@@ -337,7 +337,7 @@ bool sortByType(const QFileInfo &s1, const QFileInfo &s2) {
             ;
 }
 
-void MainWindow::browseForFile()
+void QuiteWindow::browseForFile()
 {
     QString file = QFileDialog::getOpenFileName(this); //TODO filetype filtering
     if(file.length()==0)
@@ -349,7 +349,7 @@ void MainWindow::browseForFile()
         loadFolder(fileinfo.absoluteDir().absolutePath(), fileinfo.absoluteFilePath());
 }
 
-void MainWindow::browseForFolder()
+void QuiteWindow::browseForFolder()
 {
     QString newFolder = QFileDialog::getExistingDirectory(this);
     if(newFolder.length()>0)
@@ -357,7 +357,7 @@ void MainWindow::browseForFolder()
 }
 
 
-void MainWindow::wheelEvent(QWheelEvent *event)
+void QuiteWindow::wheelEvent(QWheelEvent *event)
 {
     if(folder=="")
         return;
@@ -378,7 +378,7 @@ void MainWindow::wheelEvent(QWheelEvent *event)
 
 }
 
-void MainWindow::mousePressEvent(QMouseEvent * me)
+void QuiteWindow::mousePressEvent(QMouseEvent * me)
 {
     return;
     if(me->button()==Qt::LeftButton)
@@ -387,7 +387,7 @@ void MainWindow::mousePressEvent(QMouseEvent * me)
         prevItem();
 }
 
-void MainWindow::keyPressEvent(QKeyEvent * e)
+void QuiteWindow::keyPressEvent(QKeyEvent * e)
 {
     if(folder=="")
         return;
@@ -469,7 +469,7 @@ void MainWindow::keyPressEvent(QKeyEvent * e)
 }
 
 
-void MainWindow::nextItem()
+void QuiteWindow::nextItem()
 {
     qDebug() << "nextItem";
     ++list_index;
@@ -478,7 +478,7 @@ void MainWindow::nextItem()
     loadItem();
 }
 
-void MainWindow::prevItem()
+void QuiteWindow::prevItem()
 {
     qDebug() << "prevItem";
     if(list_index==0)
@@ -487,28 +487,28 @@ void MainWindow::prevItem()
     loadItem();
 }
 
-void MainWindow::setSpeed(double d)
+void QuiteWindow::setSpeed(double d)
 {
     qDebug() << "setSpeed " << d;
     current_manager->setSpeed(d);
     sb_speed->setText(QString("%1x").arg(d/100.0));
 }
 
-void MainWindow::startSlideshow()
+void QuiteWindow::startSlideshow()
 {
     qDebug() << "starting slideshow";
     slide_timer->start(slideshow_time->value() * 1000);
     //this->showFullScreen();
 }
 
-void MainWindow::stopSlideshow()
+void QuiteWindow::stopSlideshow()
 {
     qDebug() << "stahping slideshow";
     slide_timer->stop();
     //this->showNormal();
 }
 
-void MainWindow::restartSlideshow(int na)
+void QuiteWindow::restartSlideshow(int na)
 {
     qDebug() << "restarting slideshow";
     na = 0; //-Wunused-parameter
@@ -517,7 +517,7 @@ void MainWindow::restartSlideshow(int na)
 }
 
 
-void MainWindow::clearItem()
+void QuiteWindow::clearItem()
 {
     qDebug() << "clearing item";
     if(current_manager!=NULL)
@@ -528,7 +528,7 @@ void MainWindow::clearItem()
     sb_speed->setText("");
 }
 
-void MainWindow::unloadItem()
+void QuiteWindow::unloadItem()
 {
     if(current_manager==NULL || list_index>=list.length())
         return;
@@ -539,7 +539,7 @@ void MainWindow::unloadItem()
 }
 
 // Load the file that is marked as the current file
-void MainWindow::loadItem()
+void QuiteWindow::loadItem()
 {
     unloadItem();
 
@@ -576,7 +576,7 @@ void MainWindow::loadItem()
     clearItem();
 }
 
-void MainWindow::volumeChange(int newVol)
+void QuiteWindow::volumeChange(int newVol)
 {
     if(current_manager==NULL || newVol<0 || newVol>100)
         return;
@@ -588,7 +588,7 @@ void MainWindow::volumeChange(int newVol)
         current_manager->setVolume(newVol);
 }
 
-void MainWindow::resizeEvent(QResizeEvent * qre)
+void QuiteWindow::resizeEvent(QResizeEvent * qre)
 {
     if(current_manager!= NULL)
         current_manager->resize(qre);
@@ -601,7 +601,7 @@ void MainWindow::resizeEvent(QResizeEvent * qre)
 #include "platform/mac.h"
 #endif
 
-void MainWindow::dropEvent(QDropEvent *de)
+void QuiteWindow::dropEvent(QDropEvent *de)
 {
     qDebug() << "dropping";
     if(de->mimeData()->hasUrls())
@@ -653,7 +653,7 @@ void MainWindow::dropEvent(QDropEvent *de)
 }
 
 
-void MainWindow::showError(QString str, QString cause) {
+void QuiteWindow::showError(QString str, QString cause) {
     //TODO: Eventually make this graphical
     qDebug() << QString(str.append(": ").append(cause));
 }

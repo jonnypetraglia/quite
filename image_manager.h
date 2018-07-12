@@ -12,9 +12,9 @@ class ImageManager : public MediaManager
 {
     Q_OBJECT
 public:
-    ImageManager(MainWindow*);
+    ImageManager(QuiteWindow*);
     QWidget* widget() { return image_widget; }
-    void load(QString, QObject*, char*);
+    void load(QString, QObject*, const char*);
     void unload();
     void setSpeed(double);
     void resize(QResizeEvent*);

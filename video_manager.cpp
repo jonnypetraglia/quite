@@ -1,7 +1,7 @@
 #include "video_manager.h"
 #include "quite_window.h"
 
-VideoManager::VideoManager(MainWindow* window)
+VideoManager::VideoManager(QuiteWindow* window)
     : MediaManager(QStringList() << "flv" << "gifv" << "mov" << "mp4" << "webm")
 {
     main_window = window;
@@ -22,7 +22,7 @@ VideoManager::~VideoManager()
     delete video_output;
 }
 
-void VideoManager::load(QString file, QObject* slotOwner, char* updateSlot)
+void VideoManager::load(QString file, QObject* slotOwner, const char* updateSlot)
 {
     qDebug() << "Playing " << QUrl::fromLocalFile(file);
     //connect(video_player, SIGNAL(positionChanged(qint64)), slotOwner, updateSlot);
