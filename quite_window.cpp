@@ -228,8 +228,13 @@ void QuiteWindow::reloadFolder()
 
 void QuiteWindow::loadFileList(QStringList files, QFileInfo file) {
     list.clear();
-    for(QString str : files) {
-        list.append(QFileInfo(str));
+    for(QString file : files) {
+
+        if((list_index = list.indexOf(file,0)) < 0) {
+            list_index = 0;
+            showError("File was not found in list", QFileInfo(file).absoluteFilePath());
+        }
+        list.append(QFileInfo(file));
     }
     loadItem();
 }
