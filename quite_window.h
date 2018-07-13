@@ -8,7 +8,7 @@
 
 #include <QMainWindow>
 #include <QPushButton>
-#include <QSpinbox>
+#include <QSpinBox>
 #include <QDial>
 #include <QTimer>
 #include <QMenuBar>

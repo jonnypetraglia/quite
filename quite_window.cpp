@@ -226,14 +226,17 @@ void QuiteWindow::reloadFolder()
 }
 
 
-void QuiteWindow::loadFileList(QStringList files, QFileInfo file) {
+void QuiteWindow::loadFileList(QStringList files, QFileInfo fileWant) {
     list.clear();
+    qDebug() << files;
+    list_index = 0;
+    int i = 0;
     for(QString file : files) {
+            if(QFileInfo(file) == fileWant)
+                list_index = i;
+            else
+                i++;
 
-        if((list_index = list.indexOf(file,0)) < 0) {
-            list_index = 0;
-            showError("File was not found in list", QFileInfo(file).absoluteFilePath());
-        }
         list.append(QFileInfo(file));
     }
     loadItem();
@@ -403,7 +406,7 @@ void QuiteWindow::mousePressEvent(QMouseEvent * me)
 
 void QuiteWindow::keyPressEvent(QKeyEvent * e)
 {
-    if(folder=="")
+    if(list.size()<2)
         return;
     e->accept();
     bool shift = e->modifiers().testFlag(Qt::ShiftModifier);
@@ -411,6 +414,7 @@ void QuiteWindow::keyPressEvent(QKeyEvent * e)
 
     switch (e->key()) {
         case Qt::Key_Right:
+            qDebug() << "haHA!";
             nextItem();
             break;
         case Qt::Key_Left:
